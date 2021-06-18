@@ -9,7 +9,7 @@ LIBFORMAT = static_pic
 
 CCOPT = -m64 -O -fPIC -fno-strict-aliasing -fexceptions -DNDEBUG -DIL_STD
 
-all: solvers
+all: solvers debug
 
 solvers: BLS BMA BLS-bench BMA-bench
 
