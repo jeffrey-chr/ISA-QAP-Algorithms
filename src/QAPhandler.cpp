@@ -49,6 +49,7 @@ int main(int argc, char *argv[])
     
     std::string line;
     std::string entry;
+    int ientry;
     
     std::string delimiter = " ";
     
@@ -83,8 +84,33 @@ int main(int argc, char *argv[])
             getline (myfile, line);
         }
         
-        // The next n lines should contain the distance matrix.
-        for (int i = 0; i < n; i++)
+        // The next lines should contain the distance matrix.
+        int ii = 0;
+        int jj = 0;
+        while (line.find_first_not_of(' ') != std::string::npos && (jj != 0 || ii != n))
+        {   
+            // This line contains non-whitespace - read it.
+            std::istringstream iss(line);
+            while (iss)
+            {
+                iss >> ientry;
+                if (iss)
+                {
+                    dist[ii][jj] = ientry;
+                    jj++;
+                    if (jj >= n) {
+                        jj = 0;
+                        ii++;
+                    }
+                }
+            }
+            getline (myfile, line);
+        }
+        if (jj != 0 || ii != n) { throw (-1); }
+        
+        
+        
+        /* for (int i = 0; i < n; i++)
         {
             std::istringstream iss(line);
             for (int j = 0; j < n; j++)
@@ -93,7 +119,7 @@ int main(int argc, char *argv[])
                 dist[i][j] = std::stoi(entry);
             }
             getline (myfile, line);
-        }
+        } */
         
         while (line.find_first_not_of(' ') == std::string::npos)
         {   
@@ -101,17 +127,29 @@ int main(int argc, char *argv[])
             getline (myfile, line);
         }
         
-        // The next n lines should contain the flow matrix.
-        for (int i = 0; i < n; i++)
-        {
+        // The next lines should contain the flow matrix.
+        ii = 0;
+        jj = 0;
+        while (line.find_first_not_of(' ') != std::string::npos && (jj != 0 || ii != n))
+        {   
+            // This line contains non-whitespace - read it.
             std::istringstream iss(line);
-            for (int j = 0; j < n; j++)
+            while (iss)
             {
-                iss >> entry;
-                flow[i][j] = std::stoi(entry);
+                iss >> ientry;
+                if (iss)
+                {
+                    flow[ii][jj] = ientry;
+                    jj++;
+                    if (jj >= n) {
+                        jj = 0;
+                        ii++;
+                    }
+                }
             }
             getline (myfile, line);
         }
+        if (jj != 0 || ii != n) { throw (-1); }
     
         myfile.close();
     
@@ -156,9 +194,59 @@ int main(int argc, char *argv[])
         std::cout << "ALGORITHMNAME:\n";
     
 #ifdef NONE
-        std::cout << dist[5][1] << '\n';
-        std::cout << flow[11][2] << '\n';
-#endif
+        int mxline = 25;
+        std::cout << n << "\n";
+        if (n < mxline)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    std::cout << dist[i][j] << " ";
+                }
+                std::cout << '\n';
+            }
+            std::cout << '\n';
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    std::cout << flow[i][j] << " ";
+                }
+                std::cout << '\n';
+            }
+        }
+        else
+        {
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < mxline-7; j++)
+                {
+                    std::cout << dist[i][j] << " ";
+                }
+                std::cout << "... ";
+                for (int j = n-5; j < n; j++)
+                {
+                    std::cout << dist[i][j] << " ";
+                }
+                std::cout << '\n';
+            }
+            std::cout << '\n';
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < mxline-7; j++)
+                {
+                    std::cout << flow[i][j] << " ";
+                }
+                std::cout << "... ";
+                for (int j = n-5; j < n; j++)
+                {
+                    std::cout << flow[i][j] << " ";
+                }
+                std::cout << '\n';
+            }
+        }
+#else
 
 #ifdef BLS
         std::cout << "BLS\n";
@@ -200,7 +288,7 @@ int main(int argc, char *argv[])
         
         printf("AVERAGESOLN:\n%.6f\n",averagesoln);
         
-    
+#endif
         // TODO delete dist and flow.
     
     }
