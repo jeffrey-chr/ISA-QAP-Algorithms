@@ -30,6 +30,8 @@ int main(int argc, char *argv[])
     int n;
     long** dist;
     long** flow;
+    long maxdist;
+    long maxflow;
     
     
     if(argc>=2)
@@ -97,6 +99,7 @@ int main(int argc, char *argv[])
                 if (iss)
                 {
                     dist[ii][jj] = ientry;
+                    maxdist = (maxdist > ientry ? maxdist : ientry);
                     jj++;
                     if (jj >= n) {
                         jj = 0;
@@ -140,6 +143,7 @@ int main(int argc, char *argv[])
                 if (iss)
                 {
                     flow[ii][jj] = ientry;
+                    maxflow = (maxflow > ientry ? maxflow : ientry);
                     jj++;
                     if (jj >= n) {
                         jj = 0;
@@ -248,6 +252,15 @@ int main(int argc, char *argv[])
         }
 #else
 
+        if (maxdist == 0) {
+            std::cout << "ABORTING: Distance matrix is all zeros";
+            return 0;
+        }
+        if (maxflow == 0) {
+            std::cout << "ABORTING: Flow matrix is all zeros";
+            return 0;
+        }
+        
 #ifdef BLS
         std::cout << "BLS\n";
         jtc_interface_bls(qinput, qoutput);
@@ -265,15 +278,6 @@ int main(int argc, char *argv[])
         for (int i = 0; i < ntrials; i++)
         {
             std::cout << "Trial " << i << ": " << qoutput[i]->value << "\nTime: " << qoutput[i]->time_for_best << "s\n";
-            /* if (qoutput[i]->value < bestvalue) {
-                bestvalue = qoutput[i]->value;
-                averagetime = 0;
-                nbest = 0;
-            }
-            if (qoutput[i]->value == bestvalue) {
-                averagetime += qoutput[i]->time_for_best;
-                nbest++;
-            }  */
             averagetime += qoutput[i]->time_for_best;
             averagesoln += qoutput[i]->value;
             nbest++;
@@ -293,6 +297,6 @@ int main(int argc, char *argv[])
     
     }
     
-    
+    return 0;
     
 }
