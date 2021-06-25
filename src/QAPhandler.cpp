@@ -195,8 +195,6 @@ int main(int argc, char *argv[])
         std::cout << n << "\n";
         std::cout << "MAXTIME:\n" << maxtime << "\n";
     
-        std::cout << "ALGORITHMNAME:\n";
-    
 #ifdef NONE
         int mxline = 25;
         std::cout << n << "\n";
@@ -252,6 +250,16 @@ int main(int argc, char *argv[])
         }
 #else
 
+        std::cout << "ALGORITHMNAME:\n";
+        
+#ifdef BLS
+        std::cout << "BLS\n";
+#endif
+
+#ifdef BMA
+        std::cout << "BMA\n";
+#endif
+
         if (maxdist == 0) {
             std::cout << "ABORTING: Distance matrix is all zeros";
             return 0;
@@ -260,14 +268,12 @@ int main(int argc, char *argv[])
             std::cout << "ABORTING: Flow matrix is all zeros";
             return 0;
         }
-        
+
 #ifdef BLS
-        std::cout << "BLS\n";
         jtc_interface_bls(qinput, qoutput);
 #endif
 
 #ifdef BMA
-        std::cout << "BMA\n";
         jtc_interface_bma(qinput, qoutput);
 #endif
 

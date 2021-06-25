@@ -1,3 +1,4 @@
 # Compile target directories
 bin/
 obj/
+srcedit/
