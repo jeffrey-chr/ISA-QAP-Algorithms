@@ -520,6 +520,7 @@ parse_options (struct options *const options, const char *const program_name,
           options->opt_tsplibfile = 1;
           break;
         }
+        goto error_unknown_long_opt;
       case 'v':
           HANDLE_LONG_OPTION(opt_var_n_ants)
           HANDLE_LONG_OPTION(opt_var_beta)

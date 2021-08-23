@@ -76,12 +76,12 @@ double   *prob_of_selection;
 
 long int n_ants;      /* number of ants */
 long int max_n_ants;
-long int nn_ants;     /* length of nearest neighbor lists for the ants'
+extern long int nn_ants;     /* length of nearest neighbor lists for the ants'
 			 solution construction */
 
 double rho;           /* parameter for evaporation */
-double xi;           /* parameter for ACS local pheromone update */
-double alpha;         /* importance of trail */
+extern double xi;           /* parameter for ACS local pheromone update */
+extern double alpha;         /* importance of trail */
 double beta;          /* importance of heuristic evaluate */
 double q0;            /* probability of best choice in tour construction */
 
@@ -96,7 +96,7 @@ long int acs_flag;    /* ant colony system */
 long int elitist_ants;    /* additional parameter for elitist
 			     ant system, no. elitist ants */
 
-long int ras_ranks;       /* additional parameter for rank-based version 
+extern long int ras_ranks;       /* additional parameter for rank-based version 
 			     of ant system */
 
 double   trail_max;       /* maximum pheromone trail in MMAS */

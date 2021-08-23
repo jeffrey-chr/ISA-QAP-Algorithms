@@ -24,13 +24,13 @@ const char * const strings_ls_types [] = {
 const unsigned int LS_MAX = LS_UNKNOWN - 1;
 
 unsigned int ls_flag;
-long int nn_ls;  /* Unused here */
+extern long int nn_ls;  /* Unused here */
 long int dlb_flag; /* set to one if don't look bits should be used */
 
-long int null_diagonal_flag;
-long int d_symmetric_flag;
-long int f_symmetric_flag;
-long int make_symmetric_flag;
+extern long int null_diagonal_flag;
+extern long int d_symmetric_flag;
+extern long int f_symmetric_flag;
+extern long int make_symmetric_flag;
 
 static long int   **move_values;       /* move values in best improvement local search */
 static long int   **tabu_values;       /* entries of matrix give iteration up to which an attribute is forbidden */

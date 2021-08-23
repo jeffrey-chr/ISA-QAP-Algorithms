@@ -227,7 +227,8 @@ void read_instance (const char* filename, struct problem *instance)
     /* read instance data */
     read_problem_size( instance_file );
     /* Some instances have a number here, but we do not use it.  */
-    read_best_known_value( instance_file );
+    // JTC: commented this out entirely. Trying to read a number that is *NOT* there doesn't work very well...
+    // read_best_known_value( instance_file );
     instance->distance = read_matrix( instance_file, n);
     instance->flow = read_matrix( instance_file, n );
 #if TRACE

@@ -73,7 +73,7 @@ const char * const strings_ls_types  [] = {
 const unsigned int LS_MAX = LS_UNKNOWN - 1;
 
 unsigned int ls_flag;      /* indicates whether and which local search is used */ 
-long int nn_ls;            /* maximal depth of nearest neighbour lists used in the 
+extern long int nn_ls;            /* maximal depth of nearest neighbour lists used in the 
 			      local search */ 
 long int dlb_flag = TRUE;  /* flag indicating whether don't look bits are used. I recommend 
 			      to always use it if local search is applied */

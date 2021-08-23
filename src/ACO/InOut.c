@@ -80,14 +80,14 @@ long int n_tours;
 long int iteration;         /* iteration counter */
 long int restart_iteration; /* remember iteration when restart was done if any */
 double   restart_time;      /* remember time when restart was done if any */
-long int max_tries;         /* maximum number of independent tries */
-long int max_tours;         /* maximum number of tour constructions in one try */
-long int seed;
+extern long int max_tries;         /* maximum number of independent tries */
+extern long int max_tours;         /* maximum number of tour constructions in one try */
+extern long int seed;
 
 const double   lambda = 0.05; /* Parameter to determine branching factor */
 int     restart_freq;
 
-double   max_time;          /* maximal allowed run time of a try  */
+extern double   max_time;          /* maximal allowed run time of a try  */
 double   time_used;         /* time used until some given event */
 double   time_passed;       /* time passed until some moment*/
 long int optimal;           /* optimal solution or bound to find */
