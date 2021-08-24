@@ -107,8 +107,8 @@ double   trail_0;         /* initial pheromone level in ACS and BWAS */
 
 static void calloc_ant (ant_struct * a)
 {
-    a->tour        = calloc(n+1, sizeof(long int));
-    a->visited     = calloc(n, sizeof(bool));
+    a->tour        = (long int*) calloc(n+1, sizeof(long int));
+    a->visited     = (char*) calloc(n, sizeof(char));   // ##TODO changed this from sizeof(bool) to sizeof(char).
 }
 
 static void free_ant (ant_struct * a)
@@ -130,7 +130,7 @@ void allocate_ants ( void )
 {
     long int i;
 
-    if ((ant = malloc(sizeof(ant_struct) * max_n_ants)) == NULL) {
+    if ((ant = (ant_struct*) malloc(sizeof(ant_struct) * max_n_ants)) == NULL) {
 	printf("Out of memory, exit.");
 	exit(1);
     }
@@ -138,19 +138,19 @@ void allocate_ants ( void )
         calloc_ant (ant + i);
     }
 
-    if((best_so_far_ant = malloc(sizeof( ant_struct ) )) == NULL){
+    if((best_so_far_ant = (ant_struct*) malloc(sizeof( ant_struct ) )) == NULL){
 	printf("Out of memory, exit.");
 	exit(1);
     }
     calloc_ant (best_so_far_ant);
 
-    if((restart_best_ant = malloc(sizeof( ant_struct ) )) == NULL){
+    if((restart_best_ant = (ant_struct*) malloc(sizeof( ant_struct ) )) == NULL){
 	printf("Out of memory, exit.");
 	exit(1);
     }
     calloc_ant (restart_best_ant);
 
-    if ((prob_of_selection = malloc(sizeof(double) * (nn_ants + 1))) == NULL) {
+    if ((prob_of_selection = (double*) malloc(sizeof(double) * (nn_ants + 1))) == NULL) {
 	printf("Out of memory, exit.");
 	exit(1);
     }
@@ -174,7 +174,7 @@ void free_ants (void)
     free( restart_best_ant);
     free_ant( best_so_far_ant);
     free( best_so_far_ant);
-    for ( i = 0 ; i <  max_n_ants ; i++ ) {
+    for ( i = 0 ; i <  n_ants ; i++ ) {
 	free_ant( ant + i);
     }
     free( ant );

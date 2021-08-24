@@ -87,6 +87,7 @@ const char * ls_type_to_string(unsigned int ls_type)
 
 void local_search(unsigned int ls_type, long int *tour)
 {
+	
     switch (ls_type) {
       case LS_TWO_OPT_FIRST:
           two_opt_first(tour);    /* 2-opt local search */
@@ -131,8 +132,8 @@ void two_opt_first( long int *tour )
     long int *pos;               /* positions of cities in tour */ 
     long int *dlb;               /* vector containing don't look bits */ 
   
-    pos = malloc(n * sizeof(long int));
-    dlb = malloc(n * sizeof(long int));
+    pos = (long int*) malloc(n * sizeof(long int));
+    dlb = (long int*) malloc(n * sizeof(long int));
     for ( i = 0 ; i < n ; i++ ) {
 	pos[tour[i]] = i;
 	dlb[i] = FALSE;
@@ -291,9 +292,9 @@ void two_h_opt_first( long int *tour )
 
     long int *pos;               /* positions of cities in tour */ 
     long int *dlb;               /* vector containing don't look bits */ 
-  
-    pos = malloc(n * sizeof(long int));
-    dlb = malloc(n * sizeof(long int));
+
+    pos = (long int*) malloc(n * sizeof(long int));
+    dlb = (long int*) malloc(n * sizeof(long int));
     for ( i = 0 ; i < n ; i++ ) {
 	pos[tour[i]] = i;
 	dlb[i] = FALSE;
@@ -315,6 +316,7 @@ void two_h_opt_first( long int *tour )
 	    improve_node = FALSE;
 	    pos_c1 = pos[c1];
 	    s_c1 = tour[pos_c1+1];
+		
 	    radius = instance.distance[c1][s_c1];
 
 	    /* First search for c1's nearest neighbours, use successor of c1 */
@@ -544,10 +546,10 @@ void three_opt_first( long int *tour )
     long int *hh_tour;           /* help vector for performing exchange move */ 
     long int *random_vector;
 
-    pos = malloc(n * sizeof(long int));
-    dlb = malloc(n * sizeof(long int));
-    h_tour = malloc(n * sizeof(long int));
-    hh_tour = malloc(n * sizeof(long int));
+    pos = (long int*) malloc(n * sizeof(long int));
+    dlb = (long int*) malloc(n * sizeof(long int));
+    h_tour = (long int*) malloc(n * sizeof(long int));
+    hh_tour = (long int*) malloc(n * sizeof(long int));
 
     for ( i = 0 ; i < n ; i++ ) {
 	pos[tour[i]] = i;

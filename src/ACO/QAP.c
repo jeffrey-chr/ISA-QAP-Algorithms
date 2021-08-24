@@ -161,7 +161,7 @@ long int ** read_matrix( FILE *input, long int size )
   long int     i, j;
   long int     **matrix;
 
-  if((matrix = malloc(sizeof(long int) * size * size +
+  if((matrix = (long int**) malloc(sizeof(long int) * size * size +
 		      sizeof(long int *) * size	 )) == NULL){
     fprintf(stderr,"Out of memory, exit.\n"); 
     exit(1);
@@ -216,6 +216,86 @@ static void make_matrix_symmetric( long int **matrix, long int size )
   } 
 }
 
+#ifdef MODULE
+void read_instance_module (const char* filename, struct problem *instance, long int n_input, long int** a_input, long int** b_input )
+{
+   /* FILE *instance_file;
+
+   if ( (instance_file = fopen(filename, "r")) == NULL) {
+       fprintf(stderr, "error opening input file %s\n", filename);
+       exit(1);	
+   } */
+    /* read instance data */
+    n = n_input;
+    
+    /* Some instances have a number here, but we do not use it.  */
+    // JTC: commented this out entirely. Trying to read a number that is *NOT* there doesn't work very well...
+    // read_best_known_value( instance_file );
+    
+    long int     i, j;
+
+  if((instance->distance = (long int**) malloc(sizeof(long int) * n * n +
+              sizeof(long int *) * n	 )) == NULL){
+    fprintf(stderr,"Out of memory, exit.\n"); 
+    exit(1);
+  }
+  for ( i = 0 ; i < n ; i++ ) {
+    instance->distance[i] = (long int *)(instance->distance + n) + i*n;
+    for ( j = 0  ; j < n ; j++ ) {
+        instance->distance[i][j] = a_input[i][j];
+		//fprintf(stdout,"%d\n",instance->distance[i][j]);
+      }
+    }
+  
+  if((instance->flow = (long int**) malloc(sizeof(long int) * n * n +
+              sizeof(long int *) * n	 )) == NULL){
+    fprintf(stderr,"Out of memory, exit.\n"); 
+    exit(1);
+  }
+  for ( i = 0 ; i < n ; i++ ) {
+    instance->flow[i] = (long int *)(instance->flow + n) + i*n;
+    for ( j = 0  ; j < n ; j++ ) {
+        instance->flow[i][j] = b_input[i][j];
+		//fprintf(stdout,"%d\n",instance->flow[i][j]);
+      }
+    }
+	fprintf(stdout,"\nfoofoofoo\n");
+
+	matrix_long_print( instance->distance, n, n);
+    matrix_long_print( instance->flow, n, n);
+
+#if TRACE
+    /*matrix_long_print( instance->distance, n, n);
+      matrix_long_print( instance->flow, n, n); */
+#endif
+
+    d_symmetric_flag = check_symmetry ( instance->distance, n );
+    null_diagonal_flag = check_null_diagonal ( instance->distance, n );   
+    /* check for null-diagonal; make symmetric if possible (at most one asymmetric matrix) */
+    f_symmetric_flag = check_symmetry ( instance->flow, n );
+    /* if one matrix has already null diagonal we need not check the other */
+    if (!null_diagonal_flag )
+	null_diagonal_flag = check_null_diagonal ( instance->flow, n );
+
+    trace_print("d_symmetric_flag %ld, f_symmetric_flag %ld, null_diagonal_flag %ld\n",
+                   d_symmetric_flag, f_symmetric_flag, null_diagonal_flag);
+
+    make_symmetric_flag = XOR(d_symmetric_flag, f_symmetric_flag);
+    if ( make_symmetric_flag && null_diagonal_flag ) {
+	if ( !d_symmetric_flag )
+	    make_matrix_symmetric ( instance->distance, n );
+	else if ( !f_symmetric_flag )
+	    make_matrix_symmetric ( instance->flow, n );
+	else {
+	    fprintf(stderr,"One matrix should have been symmetric\n");
+	    exit(1);
+	}
+    }
+
+    strncpy(instance->name, filename, LINE_BUF_LEN);
+    instance->name[LINE_BUF_LEN-1] = '\0';
+}
+#else
 void read_instance (const char* filename, struct problem *instance)
 {
    FILE *instance_file;
@@ -262,6 +342,7 @@ void read_instance (const char* filename, struct problem *instance)
     strncpy(instance->name, filename, LINE_BUF_LEN);
     instance->name[LINE_BUF_LEN-1] = '\0';
 }
+#endif
 
 void free_instance (struct problem *instance)
 {

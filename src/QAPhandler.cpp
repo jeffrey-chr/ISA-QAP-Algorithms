@@ -24,6 +24,10 @@ typedef long*   ptr_long;
 #include "BMA.h"
 #endif
 
+#ifdef ACO
+#include "ACO/aco.h"
+#endif
+
 #include "structs.h"
 
 int main(int argc, char *argv[])
@@ -523,6 +527,11 @@ int main(int argc, char *argv[])
 #ifdef BMA
         std::cout << "BMA\n";
         jtc_interface_bma(qinput, qoutput);
+#endif
+
+#ifdef ACO
+        std::cout << "ACO\n";
+        jtc_interface_aco(qinput, qoutput);
 #endif
 
         long bestvalue = 1e9;

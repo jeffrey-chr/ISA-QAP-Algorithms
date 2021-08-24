@@ -11,7 +11,9 @@
 #include "utilities.h"
 #include "InOut.h"
 #include "timer.h"
+
 #include "aco.h"
+
 #include "ls.h"
 #include "adaptation.h"
 
@@ -304,7 +306,7 @@ static void ras_update( void )
 
     trace_print("Rank-based Ant System pheromone deposit\n");
 
-    help_b = malloc( n_ants  * sizeof(long int) );
+    help_b = (long int*) malloc( n_ants  * sizeof(long int) ); // ##TODO
     for ( k = 0 ; k < n_ants ; k++ )
 	help_b[k] = ant[k].tour_length;
 
@@ -432,6 +434,78 @@ static void pheromone_trail_update( void )
 
 /* --- main program ------------------------------------------------------ */
 
+#ifdef MODULE
+int jtc_interface_aco(QAP_input* qinput, QAP_output** qoutput)
+{
+    int argc = 6;
+    char *argv[6];
+    argv[0] = strdup("acoqap"); // ##TODO
+    argv[1] = strdup("--tries");
+	char argv2[300];
+	char argv4[300];
+	argv[2] = argv2;
+	argv[4] = argv4;
+    sprintf(argv[2], "%d", qinput->ntrials);
+    argv[3] = strdup("--time");
+    sprintf(argv[4], "%f", qinput->maxtime);
+    argv[5] = strdup("--mmas");
+    
+    long int n_input = qinput->n;
+    long int** a_input = qinput->dist;
+    long int** b_input = qinput->flow;
+
+    start_timers();
+
+    init_program_module(argc, argv, n_input, a_input, b_input);
+
+    nn_list = compute_nn_lists(&instance);
+    pheromone = generate_double_matrix( n, n );
+    total = generate_double_matrix( n, n );
+
+    time_used = elapsed_time( VIRTUAL );
+    printf("Initialization took %.10f seconds\n", time_used);
+	
+    for ( n_try = 0 ; n_try < max_tries ; n_try++ ) {
+
+	init_try(n_try);
+        write_report(); /* we print the initial heuristic solution.  */
+
+	while ( !termination_condition() ) {
+
+	    construct_solutions();
+
+	    if (ls_flag)
+		apply_local_search();
+
+	    update_statistics();
+
+	    pheromone_trail_update();  
+
+	    iteration++;
+
+	    search_control_and_statistics();
+
+            adapt_parameters_next_iteration();
+	}
+	exit_try(n_try);
+    
+        qoutput[n_try]->value = best_in_try[n_try];
+        qoutput[n_try]->time_for_best = (*time_best_found);
+    }
+    exit_program();
+
+    free_instance( &instance );
+    free( pheromone );
+    free( total );
+    free( best_in_try );
+    free( best_found_at );
+    free( time_best_found );
+    free( time_total_run );
+    free_ants();
+
+    return 0;
+}
+#else
 int main(int argc, char *argv[])
 /*    
       FUNCTION:       main control for running the ACO algorithms
@@ -457,9 +531,8 @@ int main(int argc, char *argv[])
 
 	init_try(n_try);
         write_report(); /* we print the initial heuristic solution.  */
-
 	while ( !termination_condition() ) {
-
+		
 	    construct_solutions();
 
 	    if (ls_flag)
@@ -480,13 +553,16 @@ int main(int argc, char *argv[])
     exit_program();
 
     free_instance( &instance );
+
     free( pheromone );
     free( total );
     free( best_in_try );
     free( best_found_at );
     free( time_best_found );
     free( time_total_run );
+	
     free_ants();
 
     return 0;
 }
+#endif

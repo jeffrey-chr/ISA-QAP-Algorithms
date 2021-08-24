@@ -364,7 +364,7 @@ long int ** generate_int_matrix( long int n, long int m)
   long int i;
   long int **matrix;
 
-  if((matrix = malloc(sizeof(long int) * n * m +
+  if((matrix = (long int**) malloc(sizeof(long int) * n * m +
 		      sizeof(long int *) * n	 )) == NULL){
     printf("Out of memory, exit.");
     exit(1);
@@ -388,7 +388,7 @@ double ** generate_double_matrix( long int n, long int m)
   long int i;
   double **matrix;
 
-  if((matrix = malloc(sizeof(double) * n * m +
+  if((matrix = (double**) malloc(sizeof(double) * n * m +
 		      sizeof(double *) * n	 )) == NULL){
     printf("Out of memory, exit.");
     exit(1);
@@ -410,7 +410,7 @@ long int * generate_random_permutation( long int vector_size )
 */
 {
    /* http://en.wikipedia.org/wiki/Fisher-Yates_shuffle */
-   long int * vector = malloc(vector_size * sizeof(long int));
+   long int * vector = (long int*) malloc(vector_size * sizeof(long int));
    int  i;
 
    for (i = 0; i < vector_size; i++)
@@ -449,7 +449,7 @@ bool check_permutation(const long int *t, int size)
 {
     bool ok = true;
     int i;
-    int * used = calloc (size, sizeof(int));
+    int * used = (int *) calloc (size, sizeof(int));
 
     if (t == NULL) {
         fprintf (stderr,"\n%s:error: permutation is not initialized!", __FUNCTION__);
@@ -503,7 +503,7 @@ long int num_different_edges (const long int *p1, const long int *p2, int n)
 {
     int i, j, h, pos, pred;
     long int distance = 0;
-    long int * pos2 = malloc(n * sizeof(long int));
+    long int * pos2 = (long int*) malloc(n * sizeof(long int));
 
     for ( i = 0 ; i < n ; i++ ) {
 	pos2[p2[i]] = i;

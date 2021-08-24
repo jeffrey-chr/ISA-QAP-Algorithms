@@ -325,7 +325,7 @@ void population_statistics ( void )
     long int *l;
     double   pop_mean, pop_stddev, avg_distance = 0.0;
     
-    l = malloc(n_ants * sizeof(long int));
+    l = (long int*) malloc(n_ants * sizeof(long int));
     for( k = 0 ; k < n_ants ; k++ ) {
 	l[k] = ant[k].tour_length;
     }
@@ -464,7 +464,90 @@ void exit_program( void )
 }
 
 
+#ifdef MODULE
+void init_program_module( long int argc, char *argv[], long int n_input, long int** a_input, long int** b_input ) 
+/*    
+      FUNCTION:       initialize the program, 
+      INPUT:          program arguments, needed for parsing commandline
+      OUTPUT:         none
+      COMMENTS:       
+*/
+{
 
+  char temp_buffer[LINE_BUF_LEN];
+
+  printf("\n%s, version %s\n", PROG_ID_STR, VERSION);
+  set_default_parameters();
+  setbuf(stdout,NULL);
+  parse_commandline(argc, argv);
+
+  assert (max_tries <= MAXIMUM_NO_TRIES);
+  
+  best_in_try = (long int*) calloc(max_tries, sizeof(long int));
+  best_found_at = (long int*) calloc(max_tries, sizeof(long int));
+  time_best_found = (double*) calloc(max_tries, sizeof(double));
+  time_total_run = (double*) calloc(max_tries, sizeof(double));
+  
+  trace_print("read problem data  `%s` ...\n", name_buf);
+
+  read_instance_module(name_buf, &instance, n_input, a_input, b_input);
+  
+  trace_print("... done\n\n");
+
+  if (opt_n_ants < 0) opt_n_ants = n;
+  /* default setting for elitist_ants is 0; if EAS is applied and
+     option elitist_ants is not used, we set the default to
+     elitist_ants = n, that is, the instance size.  */
+  /* FIXME: the parameter should be a factor (0, large] of the number of ants.  */
+  if (eas_flag && elitist_ants <= 0) elitist_ants = n;
+
+  nn_ls = MIN(n - 1, nn_ls);
+  nn_ants = (nn_ants <= 0) ? n : MIN(n - 1, nn_ants);
+
+  /* Set maximum value from option setting. */
+  max_n_ants = MAX(opt_n_ants, end_n_ants);
+
+  /* Set runtime value from option setting. */
+  n_ants = opt_n_ants;
+  beta = opt_beta;
+  rho = opt_rho;
+  q0 = opt_q0;
+
+  assert (max_n_ants < MAX_ANTS-1);
+  assert (nn_ants < MAX_NEIGHBOURS);
+  assert (nn_ants > 0);
+  assert (nn_ls > 0);
+
+  assert (n_ants < MAX_ANTS-1);
+  assert (nn_ants < MAX_NEIGHBOURS);
+  assert (nn_ants > 0);
+  assert (nn_ls > 0);
+  
+  const char * instance_name = get_instance_name(&instance);
+  if (!quiet_flag) {
+      sprintf(temp_buffer,"best.%s", instance_name);
+      trace_print("%s\n",temp_buffer);
+      report = fopen(temp_buffer, "w");
+      sprintf(temp_buffer,"cmp.%s", instance_name);
+      trace_print("%s\n",temp_buffer);
+      comp_report = fopen(temp_buffer, "w");
+      sprintf(temp_buffer,"stat.%s", instance_name);
+      trace_print("%s\n",temp_buffer);
+      stat_report = fopen(temp_buffer, "w");
+  } else {
+      report = NULL;
+      comp_report = NULL;
+      stat_report = NULL;
+  }
+   
+  write_params();
+  if (comp_report)
+      fprintf(comp_report,"begin problem %s\n",name_buf);
+  trace_print("allocate ants' memory ...\n");
+  allocate_ants();
+  trace_print("... done\n");
+}
+#else
 void init_program( long int argc, char *argv[] ) 
 /*    
       FUNCTION:       initialize the program, 
@@ -483,10 +566,10 @@ void init_program( long int argc, char *argv[] )
 
   assert (max_tries <= MAXIMUM_NO_TRIES);
   
-  best_in_try = calloc(max_tries, sizeof(long int));
-  best_found_at = calloc(max_tries, sizeof(long int));
-  time_best_found = calloc(max_tries, sizeof(double));
-  time_total_run = calloc(max_tries, sizeof(double));
+  best_in_try = (long int*) calloc(max_tries, sizeof(long int));
+  best_found_at = (long int*) calloc(max_tries, sizeof(long int));
+  time_best_found = (double*) calloc(max_tries, sizeof(double));
+  time_total_run = (double*) calloc(max_tries, sizeof(double));
   
   trace_print("read problem data  `%s` ...\n", name_buf);
   read_instance(name_buf, &instance);
@@ -545,7 +628,7 @@ void init_program( long int argc, char *argv[] )
   allocate_ants();
   trace_print("... done\n");
 }
-
+#endif
 
 
 
@@ -613,7 +696,7 @@ void printProbabilities(void)
   double   sum_prob;
 
   printf("Selection Probabilities, iteration: %ld\n",iteration);
-  p = calloc( n, sizeof(double) );
+  p = (double*) calloc( n, sizeof(double) );
 
   for (i=0; i < n; i++) {
     printf("From %ld:  ",i);

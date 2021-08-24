@@ -114,7 +114,11 @@ void exit_try( long int ntry );
 
 void exit_program( void );
 
+#ifdef MODULE
+void init_program_module( long int argc, char *argv[], long int n_input, long int** a_input, long int** b_input );
+#else
 void init_program( long int argc, char *argv[] );
+#endif
 
 void printDist(void);
 

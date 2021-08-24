@@ -794,7 +794,7 @@ int parse_commandline (int argc, char *argv [])
     if (ls_flag) {
         set_default_ls_parameters();
     }
-
+/// ##TODO evil enum casting is evil
 #define ASSIGN_ENUM_PARAMETER(PARAM, TYPE)                                     \
     do {                                                                       \
         if ( options.opt_##PARAM )                                             \
@@ -812,7 +812,7 @@ int parse_commandline (int argc, char *argv [])
                         options.arg_##PARAM, optstr__##PARAM);                 \
                 exit(1);                                                       \
             }                                                                  \
-            PARAM = opt;                                                       \
+            PARAM = (enum_##TYPE) opt;                                  \
             fprintf(stdout, (optchar__##PARAM[0] != '\0')                      \
                     ? "  -%s  --%s " : "  %2s  --%s ",                         \
                     optchar__##PARAM, optstr__##PARAM);                        \

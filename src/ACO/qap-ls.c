@@ -91,7 +91,7 @@ void first_2_opt_symmetric ( long int *q )
     long int **f = instance.flow;
 
     trace_print("first imp, symmetric case\n");
-    dlb = calloc(n, sizeof(long int));
+    dlb = (long int*) calloc(n, sizeof(long int));
 
     if ( make_symmetric_flag )
 	original_symmetric_factor = 1; /* compensation because of not dividing matrix by 2 */
@@ -150,7 +150,7 @@ void first_2_opt_asymmetric ( long int * q )
     long int ** f = instance.flow;
     
     trace_print("first imp, asymmetric case\n");
-    dlb = malloc( n * sizeof(long int) );
+    dlb = (long int*) malloc( n * sizeof(long int) );
     for ( k = 0 ; k < n ; k++ ) {
         dlb[k] = FALSE;
     }
@@ -694,8 +694,8 @@ void tabu_search(long int *s, int tabu_search_length)
   trace_print("tabu search\n");
   move_values = init_move_values();
   tabu_values = init_tabu();
-  b = malloc( n * sizeof(long int) );
-  q = malloc( n * sizeof(long int) );
+  b = (long int*) malloc( n * sizeof(long int) );
+  q = (long int*) malloc( n * sizeof(long int) );
   for ( i = 0 ; i < n ; i++ ) {
     q[i] = s[i];
     b[i] = s[i];

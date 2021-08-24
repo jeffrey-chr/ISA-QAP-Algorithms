@@ -64,11 +64,13 @@
 #include "InOut.h"
 #include "QAP.h"
 #include "timer.h"
+
 #include "aco.h"
+
 #include "qap-ls.h"
 #include "adaptation.h"
 
-const char const * PROG_ID_STR = "ACO algorithms for the QAP";
+const char * const PROG_ID_STR = "ACO algorithms for the QAP";
 
 void problem_set_default_ls_parameters(void)
 {
@@ -148,7 +150,7 @@ double node_branching(double l)
   double    avg;
   double    *num_branches;
 
-  num_branches = calloc(n, sizeof(double));
+  num_branches = (double*) calloc(n, sizeof(double));
 
   for ( m = 0 ; m < n ; m++ ) {
     /* determine max, min to calculate the cutoff value */
