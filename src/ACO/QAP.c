@@ -243,7 +243,6 @@ void read_instance_module (const char* filename, struct problem *instance, long 
     instance->distance[i] = (long int *)(instance->distance + n) + i*n;
     for ( j = 0  ; j < n ; j++ ) {
         instance->distance[i][j] = a_input[i][j];
-		//fprintf(stdout,"%d\n",instance->distance[i][j]);
       }
     }
   
@@ -256,13 +255,8 @@ void read_instance_module (const char* filename, struct problem *instance, long 
     instance->flow[i] = (long int *)(instance->flow + n) + i*n;
     for ( j = 0  ; j < n ; j++ ) {
         instance->flow[i][j] = b_input[i][j];
-		//fprintf(stdout,"%d\n",instance->flow[i][j]);
       }
     }
-	fprintf(stdout,"\nfoofoofoo\n");
-
-	matrix_long_print( instance->distance, n, n);
-    matrix_long_print( instance->flow, n, n);
 
 #if TRACE
     /*matrix_long_print( instance->distance, n, n);
