@@ -437,8 +437,8 @@ static void pheromone_trail_update( void )
 #ifdef MODULE
 int jtc_interface_aco(QAP_input* qinput, QAP_output** qoutput)
 {
-    int argc = 6;
-    char *argv[6];
+    int argc = 7;
+    char *argv[7];
     argv[0] = strdup("acoqap"); // ##TODO
     argv[1] = strdup("--tries");
 	char argv2[300];
@@ -449,6 +449,7 @@ int jtc_interface_aco(QAP_input* qinput, QAP_output** qoutput)
     argv[3] = strdup("--time");
     sprintf(argv[4], "%f", qinput->maxtime);
     argv[5] = strdup("--mmas");
+	argv[6] = strdup("--quiet");
     
     long int n_input = qinput->n;
     long int** a_input = qinput->dist;
