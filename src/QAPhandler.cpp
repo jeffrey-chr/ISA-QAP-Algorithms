@@ -10,6 +10,12 @@
 #include <cstring>
 #include <climits>
 
+
+#include <fcntl.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+
 typedef long*   ptr_long;
 
 #ifdef NONE
@@ -519,6 +525,8 @@ int main(int argc, char *argv[])
             return 0;
         }
         
+		fflush(stdout);
+		
 #ifdef BLS
         std::cout << "BLS\n";
         jtc_interface_bls(qinput, qoutput);
@@ -531,7 +539,34 @@ int main(int argc, char *argv[])
 
 #ifdef ACO
         std::cout << "ACO\n";
+		
+		
+		int save_out = dup(STDOUT_FILENO);
+		if(save_out == -1){
+			fprintf(stderr,"Error in dup(STDOUT_FILENO)\n");
+			exit(EXIT_FAILURE);
+		}
+
+		int devNull = open("/dev/null",O_WRONLY);
+		if(devNull == -1){
+			fprintf(stderr,"Error in open('/dev/null',0)\n");
+			exit(EXIT_FAILURE);
+		}
+
+		
+		int dup2Result = dup2(devNull, STDOUT_FILENO);
+		if(dup2Result == -1) {
+			fprintf(stderr,"Error in dup2(devNull, STDOUT_FILENO)\n");
+			exit(EXIT_FAILURE);
+		}
+		
+		
         jtc_interface_aco(qinput, qoutput);
+		
+		
+		dup2(save_out, STDOUT_FILENO);
+		
+		
 #endif
 
         long bestvalue = 1e9;

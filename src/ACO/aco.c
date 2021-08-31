@@ -240,8 +240,9 @@ static void update_statistics( void )
             trail_0 = trail_max;
         }
         trace_print("trail_min %.15lf trail_max %.15lf\n", trail_min, trail_max);
-
-        if (time_used < 1.) time_used = 1.0;
+		
+		// JTC: We are potentially interested in times less than 1.
+        // if (time_used < 1.) time_used = 1.0;
         write_report();
     }
     if ( ant[iteration_best_ant].tour_length < restart_best_ant->tour_length ) {
@@ -491,7 +492,7 @@ int jtc_interface_aco(QAP_input* qinput, QAP_output** qoutput)
 	exit_try(n_try);
     
         qoutput[n_try]->value = best_in_try[n_try];
-        qoutput[n_try]->time_for_best = (*time_best_found);
+        qoutput[n_try]->time_for_best = (time_best_found[n_try]);
     }
     exit_program();
 

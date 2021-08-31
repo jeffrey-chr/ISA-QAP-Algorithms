@@ -930,7 +930,7 @@ int parse_commandline (int argc, char *argv [])
                 dlb_flag ? 1 : 0, dlb_flag ? "use" : "not use");
     }
 
-    fputs ("Non-option arguments:", stderr);
+    //fputs ("Non-option arguments:", stderr);
     while (i < argc) {
 	fprintf (stderr,"  \"%s\"\n", argv [i++]);
 	fprintf (stderr,"\nThere were non-option arguments\n");
