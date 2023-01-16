@@ -38,6 +38,8 @@ typedef long*   ptr_long;
 
 int main(int argc, char *argv[])
 {
+	int ntrials = 1;
+	
     bool reduce = false;
     bool reduceA = false;
     bool reduceB = false;
@@ -159,6 +161,13 @@ int main(int argc, char *argv[])
             }
             if (std::strcmp(argv[i], "-swap") == 0) {
                 forceSwap = true;
+            }
+			if (std::strcmp(argv[i], "-trials") == 0) {
+                i++;
+                if (i < argc)
+                {
+                    ntrials = std::stoi(argv[i]);
+                }
             }
         }
     }
@@ -296,8 +305,6 @@ int main(int argc, char *argv[])
         if (jj != 0 || ii != n) { throw (-1); }
     
         myfile.close();
-    
-        int ntrials = 5;
         
 #ifdef DEBUG
         ntrials = 1;
@@ -307,12 +314,13 @@ int main(int argc, char *argv[])
         
 #ifdef BENCH
         maxtime = 8*n + 20;
-        if (n <= 30)
-            { maxtime = 2*n + 20; }
+        if (n <= 40)
+            { maxtime = 120; }
         else
-            { maxtime = 2*30 + 20 + (n-30)*8; }
+            { maxtime = 900; }
 #else
-        maxtime = 0.0228*(n*n) - 1.3722*n + 18.8760;
+        //maxtime = 0.0228*(n*n) - 1.3722*n + 18.8760;
+		maxtime = 0.001*((n-25)*(n-25)*(n-25)) - 0.085*((n-25)*(n-25)) + 4.45*(n-25) - 14.7;
         if (maxtime < 5)
         { 
             maxtime = 5; 
@@ -525,7 +533,7 @@ int main(int argc, char *argv[])
             return 0;
         }
         
-		fflush(stdout);
+		
 		
 #ifdef BLS
         std::cout << "BLS\n";
@@ -538,7 +546,8 @@ int main(int argc, char *argv[])
 #endif
 
 #ifdef ACO
-        std::cout << "ACO\n";
+		std::cout << "MMAS\n";
+		fflush(stdout);
 		
 		
 		int save_out = dup(STDOUT_FILENO);
@@ -561,7 +570,29 @@ int main(int argc, char *argv[])
 		}
 		
 		
-        jtc_interface_aco(qinput, qoutput);
+		
+		
+		int save_out = dup(STDOUT_FILENO);
+		if(save_out == -1){
+			fprintf(stderr,"Error in dup(STDOUT_FILENO)\n");
+			exit(EXIT_FAILURE);
+		}
+
+		int devNull = open("/dev/null",O_WRONLY);
+		if(devNull == -1){
+			fprintf(stderr,"Error in open('/dev/null',0)\n");
+			exit(EXIT_FAILURE);
+		}
+
+		
+		int dup2Result = dup2(devNull, STDOUT_FILENO);
+		if(dup2Result == -1) {
+			fprintf(stderr,"Error in dup2(devNull, STDOUT_FILENO)\n");
+			exit(EXIT_FAILURE);
+		}
+		
+		
+		jtc_interface_aco(qinput, qoutput);
 		
 		
 		dup2(save_out, STDOUT_FILENO);
@@ -573,20 +604,23 @@ int main(int argc, char *argv[])
         double averagetime = 0;
         double averagesoln = 0;
         int nbest = 0;
+		
+		std::cout << "TRIALS:\n";
         for (int i = 0; i < ntrials; i++)
         {
-            std::cout << "Trial " << i << ": " << qoutput[i]->value << "\nTime: " << qoutput[i]->time_for_best << "s\n";
+            std::cout << "Trial" << i << "," << qoutput[i]->value << "," << ((qoutput[i]->value / multAdjust) - invertAdjust - addAdjust) << "," << qoutput[i]->time_for_best << "s\n";
             averagetime += qoutput[i]->time_for_best;
             averagesoln += qoutput[i]->value;
             nbest++;
-#ifdef BENCH
-            if (qoutput[i]->time_for_best > 0.5*maxtime) {std::cout << "WARNING: may not have given enough time\n";}
-#endif
         }
+		std::cout << "TRIALSEND\n";
         assert(nbest > 0);
         averagetime = averagetime / nbest;
         averagesoln = averagesoln / nbest;
         std::cout << "AVERAGETIMEFORBEST:\n" << averagetime << "\n";
+#ifdef BENCH
+        if (averagetime > 0.75*maxtime) {std::cout << "WARNING: may not have given enough time\n";}
+#endif
         
         printf("AVERAGESOLN:\n%.6f\n",averagesoln);
         
