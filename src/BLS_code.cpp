@@ -36,11 +36,18 @@ using namespace std;
 long iteration = 0;
 
 //BLS parameters
-double r1 = 0.7,r2 = 0.2; // Parameters used for directed perturbation. Number of moves elapsed before perturb. 
+/* double r1 = 0.7,r2 = 0.2; // Parameters used for directed perturbation. Number of moves elapsed before perturb. 
 double init_pert_str = 0.15; //initial perturbation strength
 double perturb_str; // actual perturbation strength
 int T = 2500;
-double P0=0.75, Q=0.3;
+double P0=0.75, Q=0.3; */
+double r1;
+double r2;  // Parameters used for directed perturbation. Number of moves elapsed before perturb. 
+double init_pert_str; //initial perturbation strength
+double perturb_str; // actual perturbation strength
+int T;
+double P0; 
+double Q=0.3;
 
 
 void transpose(int & a, int & b) {long temp = a; a = b; b = temp;}
@@ -446,6 +453,44 @@ int jtc_interface_bls(QAP_input* qinput, QAP_output** qoutput)
 	for (int i = 1; i <= n; i = i+1) 
 		for (int j = 1; j <= n; j = j+1)
 			b[i][j] = qinput->flow[i-1][j-1];
+	
+	// set parameters
+	
+	//BLS parameters
+	r1 = 0.7;
+	r2 = 0.2; // Parameters used for directed perturbation. Number of moves elapsed before perturb. 
+	init_pert_str = 0.15; //initial perturbation strength
+	P0=0.75;
+	Q=0.3;
+	T = 2500;
+	
+	if (qinput->nalgparams > 6 || qinput->nalgparams < 0 )
+	{
+		cout << "Invalid number of algorithm parameters, aborting" << endl;
+		throw(-1);
+	}
+	
+	switch(qinput->nalgparams) { // note where the break is.
+		case 6:
+			T = (int) (qinput->algparams[5]+0.01);
+		case 5:
+			Q = qinput->algparams[4];
+		case 4:
+			P0 = qinput->algparams[3];
+		case 3:
+			init_pert_str = qinput->algparams[2];
+		case 2:
+			r2 = qinput->algparams[1];
+		case 1: 
+			r1 = qinput->algparams[0];
+		case 0:
+			break;
+		default:
+			cout << "Algorithm parameter switch broke" << endl;
+			throw(-1);
+	}
+	
+	
 	
 	/************** generate random solution and run BLS algorithm **************/
 

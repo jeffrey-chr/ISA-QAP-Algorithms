@@ -438,27 +438,54 @@ static void pheromone_trail_update( void )
 #ifdef MODULE
 int jtc_interface_aco(QAP_input* qinput, QAP_output** qoutput)
 {
-    int argc = 7;
-    char *argv[7];
+    //static int argc = 7;
+    //static char *argv[7];
+	static int argc = 7;
+    static char *argv[9+2];
     argv[0] = strdup("acoqap"); // ##TODO
     argv[1] = strdup("--tries");
+	
 	char argv2[300];
 	char argv4[300];
 	argv[2] = argv2;
 	argv[4] = argv4;
+	
     sprintf(argv[2], "%d", qinput->ntrials);
     argv[3] = strdup("--time");
     sprintf(argv[4], "%f", qinput->maxtime);
     argv[5] = strdup("--mmas");
 	argv[6] = strdup("--quiet");
-    
+	
+	argv[7] = strdup("");
+	char argv8[300];
+	argv[8] = argv8;
+	
+	if (qinput->nalgparams > 1 || qinput->nalgparams < 0 )
+	{
+		throw(-1);
+	}
+	
+	switch(qinput->nalgparams) { // note where the break is.
+		case 1: 
+			argv[7] = strdup("--rho");
+			sprintf(argv[8], "%f", 0.2);
+			argc = argc + 2;
+		case 0:
+			break;
+		default:
+			throw(-1);
+	}
+	
     long int n_input = qinput->n;
     long int** a_input = qinput->dist;
     long int** b_input = qinput->flow;
 
     start_timers();
 
+	// inside here set_default_parameters and parse_commandline
     init_program_module(argc, argv, n_input, a_input, b_input);
+
+	write_params();
 
     nn_list = compute_nn_lists(&instance);
     pheromone = generate_double_matrix( n, n );

@@ -731,12 +731,36 @@ int i, j;
   int num_mutations = 0;
   type_vector best_solution_ever;
   best_solution_ever = new int[n+1];
+  
+  
   init_ptr=0.15; //JUMP MAGNITUDE
+  num_generations = 50000;
+  pop_size = 15;
+  
+	if (qinput->nalgparams > 3 || qinput->nalgparams < 0 )
+	{
+		cout << "Invalid number of algorithm parameters, aborting" << endl;
+		throw(-1);
+	}
+
+	// might not be a good idea to modify pop_size? no idea.
+	switch(qinput->nalgparams) { // note where the break is.
+		case 3:
+			pop_size = (int) (qinput->algparams[2]+0.1);
+		case 2:
+			num_generations = (int) (qinput->algparams[1]+0.1);
+		case 1: 
+			init_ptr = qinput->algparams[0];
+		case 0:
+			break;
+		default:
+			cout << "Algorithm parameter switch broke" << endl;
+			throw(-1);
+	}
+	
   
   int gener;
-  pop_size = 15;
-  num_generations = 50000;
-
+  
   a = new long* [n+1];
   b = new long* [n+1];
   pop = new unsigned short int *[pop_size+2];

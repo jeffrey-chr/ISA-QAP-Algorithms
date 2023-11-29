@@ -7,9 +7,12 @@ typedef struct QAP_input{
     long** flow;
     double maxtime;
     int ntrials;
+	
+	int nalgparams;
+	double* algparams;
     
-    QAP_input(int nn, long** dd, long** ff, double t, int ntry) : n(nn), dist(dd), flow(ff), maxtime(t), ntrials(ntry) {;}
-    ~QAP_input() {;} // The handler is responsible for deleting dist and flow.
+    QAP_input(int nn, long** dd, long** ff, double t, int ntry, int npar, double* par) : n(nn), dist(dd), flow(ff), maxtime(t), ntrials(ntry), nalgparams(npar), algparams(par) {;}
+    ~QAP_input() {;} // The handler is responsible for deleting dist, flow and algparams.
 } QAP_input;
 
 typedef struct QAP_output{

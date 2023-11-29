@@ -90,6 +90,8 @@ int main(int argc, char *argv[])
     }
     
     const char* path = argv[1];
+	
+	std::string algparamstring = "";
     
     // Some quick and dirty command line parameters for modifying the instance.
     
@@ -169,6 +171,13 @@ int main(int argc, char *argv[])
                     ntrials = std::stoi(argv[i]);
                 }
             }
+			if (std::strcmp(argv[i], "-algparams") == 0) {
+                i++;
+                if (i < argc)
+                {
+                    algparamstring.assign(argv[i]);
+                }
+            }
         }
     }
     
@@ -182,6 +191,33 @@ int main(int argc, char *argv[])
     multiplierA *= multiplier;
     multiplierB *= multiplier;
     
+	//
+	int nalgpar = 0;
+	double* algpars;
+	if (algparamstring.length() > 0)
+	{
+		nalgpar = 1;
+		std::size_t found = algparamstring.find_first_of(",");
+		while (found!=std::string::npos)
+		{
+			nalgpar++;
+			found = algparamstring.find_first_of(",", found+1);
+		}
+		//std::cout << "nalgpar: " << nalgpar << "\n";
+		algpars = new double[nalgpar];
+		for (int j = 0; j < nalgpar; j++) { algpars[j] = -1; }
+		std::size_t start = 0;
+		found = algparamstring.find_first_of(",");
+		int i = 0;
+		while (found!=std::string::npos && i < nalgpar)
+		{
+			algpars[i] = std::stod(algparamstring.substr(start,found-start));
+			i = i + 1;
+			start = found+1;
+			found = algparamstring.find_first_of(",", found+1);
+		}
+		algpars[i] = std::stod(algparamstring.substr(start,std::string::npos));
+	}
     //
     
     std::ifstream myfile;
@@ -453,7 +489,7 @@ int main(int argc, char *argv[])
             } 
         }
         
-        QAP_input* qinput = new QAP_input(n, dist, flow, maxtime, ntrials);
+        QAP_input* qinput = new QAP_input(n, dist, flow, maxtime, ntrials, nalgpar, algpars);
     
         QAP_output** qoutput = new QAP_output*[ntrials];
         for (int i = 0; i < ntrials; i++)
@@ -464,11 +500,17 @@ int main(int argc, char *argv[])
         std::cout << "INSTANCESIZE:\n";
         std::cout << n << "\n";
         std::cout << "MAXTIME:\n" << maxtime << "\n";
-    
+		std::cout << "ALGPARAMETERS:" << "\n";
+		for (int i = 0; i < nalgpar; i++) {
+			std::cout << algpars[i] << " ";
+		}
+		std::cout << '\n';
         std::cout << "ALGORITHMNAME:\n";
     
 #ifdef NONE
+		std::cout << "HANDLERTEST\n";
         int mxline = 25;
+		
         std::cout << n << "\n";
         if (n < mxline)
         {
@@ -568,29 +610,6 @@ int main(int argc, char *argv[])
 			fprintf(stderr,"Error in dup2(devNull, STDOUT_FILENO)\n");
 			exit(EXIT_FAILURE);
 		}
-		
-		
-		
-		
-		int save_out = dup(STDOUT_FILENO);
-		if(save_out == -1){
-			fprintf(stderr,"Error in dup(STDOUT_FILENO)\n");
-			exit(EXIT_FAILURE);
-		}
-
-		int devNull = open("/dev/null",O_WRONLY);
-		if(devNull == -1){
-			fprintf(stderr,"Error in open('/dev/null',0)\n");
-			exit(EXIT_FAILURE);
-		}
-
-		
-		int dup2Result = dup2(devNull, STDOUT_FILENO);
-		if(dup2Result == -1) {
-			fprintf(stderr,"Error in dup2(devNull, STDOUT_FILENO)\n");
-			exit(EXIT_FAILURE);
-		}
-		
 		
 		jtc_interface_aco(qinput, qoutput);
 		
