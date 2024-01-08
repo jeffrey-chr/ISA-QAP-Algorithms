@@ -350,14 +350,15 @@ int main(int argc, char *argv[])
         
 #ifdef BENCH
         maxtime = 8*n + 20;
-        if (n <= 40)
+        if (n <= 5)
             { maxtime = 120; }
         else
-            { maxtime = 900; }
+            { maxtime = 1200; }
 #else
         //maxtime = 0.0228*(n*n) - 1.3722*n + 18.8760;
-		maxtime = 0.001*((n-25)*(n-25)*(n-25)) - 0.085*((n-25)*(n-25)) + 4.45*(n-25) - 14.7;
-        if (maxtime < 5)
+		//maxtime = 0.001*((n-25)*(n-25)*(n-25)) - 0.085*((n-25)*(n-25)) + 4.45*(n-25) - 14.7;
+	maxtime = 0.0445*((n-25)*(n-25)) + 0.9471*(n-25) +7.6896;
+	if (maxtime < 5)
         { 
             maxtime = 5; 
         }

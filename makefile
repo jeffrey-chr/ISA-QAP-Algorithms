@@ -32,7 +32,9 @@ ACO_CFLAGS=$(ACO_WARN_FLAGS) $(ACO_OPT_FLAGS) $(ACO_DEBUGFLAGS) $(ACO_TRACEFLAGS
 
 all: solvers debug
 
-solvers: BLS BMA BLS-bench BMA-bench
+solvers: BLS BMA MMAS 
+
+bench: BLS-bench BMA-bench MMAS-bench
 
 debug: BLS-debug BMA-debug
 
@@ -55,14 +57,14 @@ BLS-bench: ./src/BLS_code.cpp
 
 	$(CXX) $(CXXFLAGS) -c -o ./obj/BLS-bench.o ./src/BLS_code.cpp \
 		
-	$(CXX) $(CXXFLAGS) -o ./bin/BLS-debug ./obj/BLS-bench.o ./obj/handler-BLS-bench.o \
+	$(CXX) $(CXXFLAGS) -o ./bin/BLS-bench ./obj/BLS-bench.o ./obj/handler-BLS-bench.o \
 
 BMA-bench: ./src/BMA.cpp	
 	$(CXX) $(CXXFLAGS) -c -D BMA -D BENCH -o ./obj/handler-BMA-bench.o ./src/QAPhandler.cpp \
 
 	$(CXX) $(CXXFLAGS) -c -o ./obj/BMA-bench.o ./src/BMA.cpp \
 		
-	$(CXX) $(CXXFLAGS) -o ./bin/BMA-debug ./obj/BMA-bench.o ./obj/handler-BMA-bench.o \
+	$(CXX) $(CXXFLAGS) -o ./bin/BMA-bench ./obj/BMA-bench.o ./obj/handler-BMA-bench.o \
 
 
 BLS-debug: ./src/BLS_code.cpp	
@@ -107,6 +109,36 @@ MMAS: ./src/ACO/acoqap.c ./src/ACO/aco.c ./src/ACO/QAP.c ./src/ACO/QAP.h ./src/A
 
 	$(CXX) $(ACO_CFLAGS) -o ./bin/MMAS ./obj/handler-ACO.o ./obj/acoqap.o ./obj/aco.o ./obj/QAP-aco.o ./obj/utilities-aco.o ./obj/ants-aco.o ./obj/qap-ants-aco.o ./obj/InOut-aco.o ./obj/unix_timer-aco.o ./obj/ls-aco.o ./obj/parse-aco.o ./obj/adaptation-aco.o \
 	
+MMAS-bench: ./src/ACO/acoqap.c ./src/ACO/aco.c ./src/ACO/QAP.c ./src/ACO/QAP.h ./src/ACO/utilities.c ./src/ACO/utilities.h ./src/ACO/ants.c ./src/ACO/qap-ants.c ./src/ACO/ants.h ./src/ACO/aco-parameters.def ./src/ACO/InOut.c ./src/ACO/InOut.h ./src/ACO/unix_timer.c ./src/ACO/timer.h ./src/ACO/qap-ls.c ./src/ACO/qap-ls.h ./src/ACO/parse.c ./src/ACO/parse.h ./src/ACO/adaptation.h 
+
+	$(CXX) $(CXXFLAGS) -c -D ACO -D BENCH -D MODULE -o ./obj/handler-ACO-bench.o ./src/QAPhandler.cpp \
+
+	$(CXX) $(ACO_CFLAGS) -c -D MODULE -o ./obj/acoqap.o ./src/ACO/acoqap.c \
+
+	$(CXX) $(ACO_CFLAGS) -c -D MODULE -o ./obj/aco.o ./src/ACO/aco.c \
+
+	$(CXX) $(ACO_CFLAGS) -c -D MODULE -o ./obj/QAP-aco.o ./src/ACO/QAP.c \
+
+	$(CXX) $(ACO_CFLAGS) -c -D MODULE -o ./obj/utilities-aco.o ./src/ACO/utilities.c \
+
+	$(CXX) $(ACO_CFLAGS) -c -D MODULE -o ./obj/ants-aco.o ./src/ACO/ants.c \
+
+	$(CXX) $(ACO_CFLAGS) -c -D MODULE -o ./obj/qap-ants-aco.o ./src/ACO/qap-ants.c \
+
+	$(CXX) $(ACO_CFLAGS) -c -D MODULE -o ./obj/InOut-aco.o ./src/ACO/InOut.c \
+
+	$(CXX) $(ACO_CFLAGS) -c -D MODULE -o ./obj/unix_timer-aco.o ./src/ACO/unix_timer.c \
+
+	$(CXX) $(ACO_CFLAGS) -c -D MODULE -o ./obj/ls-aco.o ./src/ACO/qap-ls.c \
+
+	$(CXX) $(ACO_CFLAGS) -c -D MODULE -o ./obj/parse-aco.o ./src/ACO/parse.c \
+
+	$(CXX) $(ACO_CFLAGS) -c -D MODULE -o ./obj/adaptation-aco.o ./src/ACO/adaptation.c \
+
+	$(CXX) $(ACO_CFLAGS) -o ./bin/MMAS-bench ./obj/handler-ACO-bench.o ./obj/acoqap.o ./obj/aco.o ./obj/QAP-aco.o ./obj/utilities-aco.o ./obj/ants-aco.o ./obj/qap-ants-aco.o ./obj/InOut-aco.o ./obj/unix_timer-aco.o ./obj/ls-aco.o ./obj/parse-aco.o ./obj/adaptation-aco.o \
+	
+
+
 ACO-MAIN: ./src/ACO/acoqap.c ./src/ACO/aco.c ./src/ACO/QAP.c ./src/ACO/QAP.h ./src/ACO/utilities.c ./src/ACO/utilities.h ./src/ACO/ants.c ./src/ACO/qap-ants.c ./src/ACO/ants.h ./src/ACO/aco-parameters.def ./src/ACO/InOut.c ./src/ACO/InOut.h ./src/ACO/unix_timer.c ./src/ACO/timer.h ./src/ACO/qap-ls.c ./src/ACO/qap-ls.h ./src/ACO/parse.c ./src/ACO/parse.h ./src/ACO/adaptation.h 
 
 	$(CXX) $(ACO_CFLAGS) -c  -o ./obj/acoqap.o ./src/ACO/acoqap.c \
