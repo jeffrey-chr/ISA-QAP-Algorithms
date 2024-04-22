@@ -4,17 +4,22 @@
 #include <stdlib.h>
 #include <map>
 #include<cmath>
+#include<cstdint>
 
 #include "structs.h"
 
+typedef int_fast64_t reallng;
+
 typedef int*   type_vector;
 
-typedef long** type_matrix;
+typedef reallng** type_matrix;
 typedef unsigned short int** type_matrix_s;
 
 
-const long infinite = 999999999;
+const reallng infinite = 999999999;
 
+const int MAX_N = 150;
+const int MAX_POP_SIZE = 50;
 
 using namespace std;
 
@@ -23,15 +28,15 @@ unsigned short int best_solution_found[300];
 
 double perturb_str, init_ptr;
 clock_t start;
-long iteration = 0;
+reallng iteration = 0;
 
 unsigned long long resulting_cost = 99999999999ULL;
-long target;
+reallng target;
 
 double global_maxtime;
 
 
-void output(long n, string f_name, long all_sol[],  int num_runs, long best_cost, type_vector & s, double times[])
+void output(reallng n, string f_name, reallng all_sol[],  int num_runs, reallng best_cost, type_vector & s, double times[])
 {
             char una[70];
             
@@ -72,7 +77,7 @@ void output(long n, string f_name, long all_sol[],  int num_runs, long best_cost
             out.close();
 }
 
-void transpose(int & a, int & b) {long temp = a; a = b; b = temp;}
+void transpose(int & a, int & b) {reallng temp = a; a = b; b = temp;}
 
 
 
@@ -86,11 +91,11 @@ void transpose(int & a, int & b) {long temp = a; a = b; b = temp;}
 
 /*--------------------------------------------------------------*/
 
-long compute_delta(int n, type_matrix & a, type_matrix & b,
+reallng compute_delta(int n, type_matrix & a, type_matrix & b,
 
                    type_vector & p, int i, int j)
 
- {long d; int k;
+ {reallng d; int k;
 
   d = (a[i][i]-a[j][j])*(b[p[j]][p[j]]-b[p[i]][p[i]]) +
 
@@ -116,7 +121,7 @@ long compute_delta(int n, type_matrix & a, type_matrix & b,
 
 /*--------------------------------------------------------------*/
 
-long compute_delta_part(type_matrix & a, type_matrix & b,
+reallng compute_delta_part(type_matrix & a, type_matrix & b,
 
                         type_vector & p, type_matrix & delta, 
 
@@ -132,7 +137,7 @@ long compute_delta_part(type_matrix & a, type_matrix & b,
 
   }
 
-void update_matrix_of_move_cost(int i_retained, int j_retained,long n, type_matrix & delta, type_vector & p, type_matrix & a, type_matrix & b)
+void update_matrix_of_move_cost(int i_retained, int j_retained,reallng n, type_matrix & delta, type_vector & p, type_matrix & a, type_matrix & b)
 {
      int i, j;
      for (i = 1; i < n; i = i+1) for (j = i+1; j <= n; j = j+1)
@@ -151,11 +156,11 @@ void update_matrix_of_move_cost(int i_retained, int j_retained,long n, type_matr
 
          {delta[i][j] = compute_delta(n, a, b, p, i, j);};
 }
-void perturbe(type_vector & p,long n, type_matrix & delta, long & current_cost, type_matrix & a, type_matrix & b,
-             type_matrix & last_swaped, type_matrix & frequency, int iter_without_improvement, long & best_best_cost)
+void perturbe(type_vector & p,reallng n, type_matrix & delta, reallng & current_cost, type_matrix & a, type_matrix & b,
+             type_matrix & last_swaped, type_matrix & frequency, int iter_without_improvement, reallng & best_best_cost)
 {
    int i_retained=-1, j_retained=-1, k, i, j, min_delta, min;
-   long cost = current_cost; int bit;
+   reallng cost = current_cost; int bit;
    bit=0;
    double d = static_cast<double>(iter_without_improvement)/249;
    double e = pow(2.718, -d);
@@ -209,13 +214,13 @@ void perturbe(type_vector & p,long n, type_matrix & delta, long & current_cost, 
    }
 }
 
-void local_search(long n,                  // problem size
+void local_search(reallng n,                  // problem size
 
                  type_matrix & a,         // flows matrix
                  type_matrix & b,         // distance matrix
                  type_vector & best_sol,  // best solution found
-                 long & best_best_cost,        // cost of best solution
-                 long nr_iterations,
+                 reallng & best_best_cost,        // cost of best solution
+                 reallng nr_iterations,
                  clock_t & time)
 
  {type_vector p;                        // current solution
@@ -223,16 +228,16 @@ void local_search(long n,                  // problem size
   type_matrix delta;                    // store move costs
   type_matrix last_swaped;
   type_matrix frequency;
-  long current_iteration;               // current iteration
-  long current_cost, best_cost;                    // current sol. value
+  reallng current_iteration;               // current iteration
+  reallng current_cost, best_cost;                    // current sol. value
 
   int i, j, k, i_retained, j_retained, bit;  // indices
   int iter_without_improvement = 0;
-  long  iter_last_improvement=0; 
+  reallng  iter_last_improvement=0; 
   perturb_str = init_ptr*n;
 
   bool perturbed_once = false;
-  long previous_cost=1;
+  reallng previous_cost=1;
   iteration = 0;
  
   
@@ -240,14 +245,14 @@ void local_search(long n,                  // problem size
 
   p = new int[n+1];
 
-  delta = new long* [n+1];
-  last_swaped = new long* [n+1];
-  frequency = new long* [n+1];
+  delta = new reallng* [n+1];
+  last_swaped = new reallng* [n+1];
+  frequency = new reallng* [n+1];
   for (i = 1; i <= n; i = i+1)
   { 
-     delta[i] = new long[n+1]; 
-     last_swaped[i] = new long [n+1];
-     frequency[i] = new long [n+1];
+     delta[i] = new reallng[n+1]; 
+     last_swaped[i] = new reallng [n+1];
+     frequency[i] = new reallng [n+1];
    }
 
   /************** current solution initialization ****************/
@@ -279,7 +284,7 @@ void local_search(long n,                  // problem size
 
     i_retained = infinite;       // in case all moves are tabu
 
-    long min_delta = infinite;   // retained move cost
+    reallng min_delta = infinite;   // retained move cost
 
 
     for (i = 1; i < n; i = i + 1) 
@@ -356,7 +361,7 @@ void local_search(long n,                  // problem size
 
 } // tabu
 
-void generate_random_solution(long n, type_vector  & p)
+void generate_random_solution(reallng n, type_vector  & p)
 
  {int i;
 
@@ -366,7 +371,7 @@ void generate_random_solution(long n, type_vector  & p)
 
  }
 
-void generate_random_population(long n, int pop_size, type_matrix_s & pop)
+void generate_random_population(reallng n, int pop_size, type_matrix_s & pop)
 {
     int i, j;
     for(i=0; i<pop_size; i++)
@@ -376,7 +381,7 @@ void generate_random_population(long n, int pop_size, type_matrix_s & pop)
     }
 }
 
-bool not_assigned_in_child(long n, type_vector child_sol, int vertex)
+bool not_assigned_in_child(reallng n, type_vector child_sol, int vertex)
 {
    int j; bool result = false;
    for(j=1; j<=n; j++)
@@ -388,10 +393,10 @@ bool not_assigned_in_child(long n, type_vector child_sol, int vertex)
 }
 
 
-void crossos_uni(long n, type_vector & child_sol, type_matrix_s & pop, int pop_size, double *dist)
+void crossos_uni(reallng n, type_vector & child_sol, type_matrix_s & pop, int pop_size, double *dist)
 {
    int random;
-   int unassigned[n+1];
+   int unassigned[MAX_N+1]; // changed this to fixed size array
 
    for(int i=1; i<=n; i++) 
    {
@@ -436,9 +441,9 @@ void crossos_uni(long n, type_vector & child_sol, type_matrix_s & pop, int pop_s
 
 }
 
-long avg_pop_cost(long *pop_costs, int pop_size)
+reallng avg_pop_cost(reallng *pop_costs, int pop_size)
 {
-   long min1 = 0, min2=0, c=0;
+   reallng min1 = 0, min2=0, c=0;
    int i;
    for(i=0; i<pop_size; i++)
    {
@@ -456,7 +461,7 @@ long avg_pop_cost(long *pop_costs, int pop_size)
    return min2/c;
 }
 
-long worst_pop_cost(long *pop_costs, int pop_size)
+reallng worst_pop_cost(reallng *pop_costs, int pop_size)
 {
    long long min = 0;
    int i;
@@ -467,7 +472,7 @@ long worst_pop_cost(long *pop_costs, int pop_size)
    }
    return min;
 }
-long best_pop_cost(long *pop_costs, int pop_size)
+reallng best_pop_cost(reallng *pop_costs, int pop_size)
 {
    long long min = 99999999999LL;
    int i;
@@ -479,7 +484,7 @@ long best_pop_cost(long *pop_costs, int pop_size)
    return min;
 }
 // Returns 1 if all individuals are unique, 0 otherwise?
-bool unique_individuals(long n, type_matrix_s & pop, int pop_size)
+bool unique_individuals(reallng n, type_matrix_s & pop, int pop_size)
 {
    int min = 999999;
    int k, i, j, count=0;
@@ -505,13 +510,13 @@ bool unique_individuals(long n, type_matrix_s & pop, int pop_size)
    } 
    return 0;
 }
-void replacement_other(long n, type_vector & child_sol, long  child_cost, type_matrix_s & pop,  long *pop_costs, int pop_size)
+void replacement_other(reallng n, type_vector & child_sol, reallng  child_cost, type_matrix_s & pop,  reallng *pop_costs, int pop_size)
 {
    int i, j, k, replace_with;
    int min = 999999, sum=0, count;
    int min_dist=99999;
-   int dist[pop_size+2];
-   double score[pop_size+2];
+   int dist[MAX_POP_SIZE+2]; // changed this to fixed size array
+   double score[MAX_POP_SIZE+2]; // changed this to fixed size array
    long long mx=0;
    
    for(j=1; j<=n; j++)
@@ -557,9 +562,9 @@ void replacement_other(long n, type_vector & child_sol, long  child_cost, type_m
    }
 }
 
-void check_validity(long n, type_vector & child_sol)
+void check_validity(reallng n, type_vector & child_sol)
 {
-   int array[n+1];
+   int array[MAX_N+1]; // changed this to fixed size array
    for(int i=1; i<=n; i++)
       array[i] = 0;
    for(int i=1; i<=n; i++)
@@ -570,7 +575,7 @@ void check_validity(long n, type_vector & child_sol)
    }
 }
 
-void best_individual(int n, type_matrix_s pop, long* pop_costs, int pop_size)
+void best_individual(int n, type_matrix_s pop, reallng* pop_costs, int pop_size)
 {
     long long best = 99999999999ll;
     int b;
@@ -589,7 +594,7 @@ void best_individual(int n, type_matrix_s pop, long* pop_costs, int pop_size)
        resulting_cost= best;
     }
 }
-int best_index(int pop_size,long* pop_costs)
+int best_index(int pop_size,reallng* pop_costs)
 {
    int b;
    long long  min = 100000000000ll; 
@@ -603,7 +608,7 @@ int best_index(int pop_size,long* pop_costs)
    }
     return b;
 }
-void parent_selection(int n, type_matrix_s pop, int pop_size, long* pop_cost, type_matrix_s & parent_pool,  int num_of_parents, int *parents)
+void parent_selection(int n, type_matrix_s pop, int pop_size, reallng* pop_cost, type_matrix_s & parent_pool,  int num_of_parents, int *parents)
 {
    int random;
    int a =0;
@@ -651,10 +656,10 @@ void parent_selection(int n, type_matrix_s pop, int pop_size, long* pop_cost, ty
    } //cout<<"EXITING"<<endl;
 }
 
-void mutate_population(long n, int pop_size, type_matrix_s & pop, int strength, int best)
+void mutate_population(reallng n, int pop_size, type_matrix_s & pop, int strength, int best)
 {
    int r1, r2;
-   bool mutated[n+1];
+   bool mutated[MAX_N+1]; // changed this to fixed size array
  
    for(int i=0; i<pop_size; i++)
    {
@@ -677,11 +682,11 @@ void mutate_population(long n, int pop_size, type_matrix_s & pop, int strength, 
     // } 
    }
 }
-void short_improvement_of_individuals(long n,  int pop_size, type_matrix_s & pop, long* pop_cost, type_matrix & a, type_matrix & b, clock_t & time)
+void short_improvement_of_individuals(reallng n,  int pop_size, type_matrix_s & pop, reallng* pop_cost, type_matrix & a, type_matrix & b, clock_t & time)
 {
    type_vector p = new int[n+1];
    int i, j;
-   long p_cost;
+   reallng p_cost;
    
    for(i=0; i<pop_size; i++)
    {
@@ -708,8 +713,8 @@ int num_of_parents;
 
 type_vector child_sol;     // solution (permutation) 
 
-long child_cost;                // solution cost
-long pop_costs[50];
+reallng child_cost;                // solution cost
+reallng pop_costs[50];
 
 
 ifstream data_file;       
@@ -758,11 +763,13 @@ int i, j;
 			throw(-1);
 	}
 	
+    if (n > MAX_N) { cout << "n exceeded MAX_N in BMA.cpp" << endl; throw(-1); }
+    if (pop_size > MAX_POP_SIZE) { cout << "pop_size exceeded MAX_POP_SIZE in BMA.cpp" << endl; throw(-1); }
   
   int gener;
   
-  a = new long* [n+1];
-  b = new long* [n+1];
+  a = new reallng* [n+1];
+  b = new reallng* [n+1];
   pop = new unsigned short int *[pop_size+2];
   parent_pool = new unsigned short int *[50]; 
   int parents[30];
@@ -770,8 +777,8 @@ int i, j;
 
   for (i = 1; i <= n; i = i+1)
   {   
-      a[i] = new long[n+1];
-      b[i] = new long[n+1];
+      a[i] = new reallng[n+1];
+      b[i] = new reallng[n+1];
       child_sol = new int[n+1];
 
   }
@@ -789,7 +796,7 @@ int i, j;
 
     b[i][j] = qinput->flow[i-1][j-1];
 
-   long all_solutions[101];
+   reallng all_solutions[101];
 
    int num_runs = qinput->ntrials; // TODO was 5
    

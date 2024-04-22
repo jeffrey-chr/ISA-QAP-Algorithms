@@ -9,28 +9,37 @@
 #include <assert.h>
 #include <cstring>
 #include <climits>
+#include <ctime>
+#include <cstdlib>
+
+#if defined(unix) || defined(__unix__) || defined(__unix)
+#define PREDEF_PLATFORM_UNIX
+#endif
 
 
 #include <fcntl.h>
+#ifdef PREDEF_PLATFORM_UNIX
 #include <sys/wait.h>
 #include <unistd.h>
+#endif
+// #include "matrixScrambler.h"
 
-
-typedef long*   ptr_long;
+typedef int_fast64_t reallng;
+typedef reallng*   ptr_reallng;
 
 #ifdef NONE
     // just testing the file reading code
 #endif
 
-#ifdef BLS
+#ifdef ALGBLS
 #include "BLS_code.h"
 #endif
 
-#ifdef BMA
+#ifdef ALGBMA
 #include "BMA.h"
 #endif
 
-#ifdef ACO
+#ifdef ALGACO
 #include "ACO/aco.h"
 #endif
 
@@ -44,41 +53,45 @@ int main(int argc, char *argv[])
     bool reduceA = false;
     bool reduceB = false;
     
-    long additive = 0;
-    long additiveADiag = 0;
-    long additiveAElse = 0;
-    long additiveBDiag = 0;
-    long additiveBElse = 0;
+    reallng additive = 0;
+    reallng additiveADiag = 0;
+    reallng additiveAElse = 0;
+    reallng additiveBDiag = 0;
+    reallng additiveBElse = 0;
     
-    long addAdjust = 0;
+    reallng addAdjust = 0;
     
     bool invert = false;
     
-    long invertAdjust = 0;
+    reallng invertAdjust = 0;
     
-    long multiplier = 1;
-    long multiplierA = 1;
-    long multiplierB = 1;
+    reallng multiplier = 1;
+    reallng multiplierA = 1;
+    reallng multiplierB = 1;
     
-    long multAdjust = 1;
+    reallng multAdjust = 1;
     
     bool forceSwap = false;
+	
+	bool scramble = false;
 
     int n;
-    long** dist;
-    long** flow;
-    long maxdist = 0;
-    long maxflow = 0;
+    reallng** dist;
+    reallng** flow;
+    reallng maxdist = 0;
+    reallng maxflow = 0;
     
-    long mindistdiag = 1e9;
-    long minflowdiag = 1e9;
-    long mindistelse = 1e9;
-    long minflowelse = 1e9;
-    long tracedist = 0;
-    long traceflow = 0;
-    long offsumdist = 0;
-    long offsumflow = 0;
+    reallng mindistdiag = (reallng) 1e9;
+    reallng minflowdiag = (reallng) 1e9;
+    reallng mindistelse = (reallng) 1e9;
+    reallng minflowelse = (reallng) 1e9;
+    reallng tracedist = 0;
+    reallng traceflow = 0;
+    reallng offsumdist = 0;
+    reallng offsumflow = 0;
     
+    printf("argc is %d\n", argc);
+
     if(argc>=2)
     {
         printf("INSTANCENAME:\n%s\n",argv[1]);
@@ -164,6 +177,9 @@ int main(int argc, char *argv[])
             if (std::strcmp(argv[i], "-swap") == 0) {
                 forceSwap = true;
             }
+			if (std::strcmp(argv[i], "-scramble") == 0) {
+                scramble = true;
+            }
 			if (std::strcmp(argv[i], "-trials") == 0) {
                 i++;
                 if (i < argc)
@@ -181,7 +197,10 @@ int main(int argc, char *argv[])
         }
     }
     
+	if (scramble) { std::srand ( unsigned ( std::time(0) ) ); }
+	
     if (reduce) { reduceA = true; reduceB = true; }
+	
     
     additiveADiag += additive;
     additiveAElse += additive;
@@ -218,6 +237,11 @@ int main(int argc, char *argv[])
 		}
 		algpars[i] = std::stod(algparamstring.substr(start,std::string::npos));
 	}
+    else
+    {
+        algpars = new double[1];
+    }
+
     //
     
     std::ifstream myfile;
@@ -245,12 +269,12 @@ int main(int argc, char *argv[])
             n = std::stoi(entry);
         }
         
-        dist = new ptr_long[n];
-        flow = new ptr_long[n];
+        dist = new ptr_reallng[n];
+        flow = new ptr_reallng[n];
         for (int i = 0; i < n; i++)
         {
-            dist[i] = new long[n];
-            flow[i] = new long[n];
+            dist[i] = new reallng[n];
+            flow[i] = new reallng[n];
         }            
         
         getline (myfile, line);
@@ -266,9 +290,10 @@ int main(int argc, char *argv[])
         int jj = 0;
         while (line.find_first_not_of(' ') != std::string::npos && (jj != 0 || ii != n))
         {   
+            bool mat1done = false;
             // This line contains non-whitespace - read it.
             std::istringstream iss(line);
-            while (iss)
+            while (!mat1done && iss)
             {
                 iss >> ientry;
                 if (iss)
@@ -291,6 +316,9 @@ int main(int argc, char *argv[])
                         jj = 0;
                         ii++;
                     }
+                    if (ii >= n) {
+                        mat1done = true;
+                    }
                 }
             }
             getline (myfile, line);
@@ -308,9 +336,10 @@ int main(int argc, char *argv[])
         jj = 0;
         while (line.find_first_not_of(' ') != std::string::npos && (jj != 0 || ii != n))
         {   
+            bool mat2done = false;
             // This line contains non-whitespace - read it.
             std::istringstream iss(line);
-            while (iss)
+            while (!mat2done && iss)
             {
                 iss >> ientry;
                 if (iss)
@@ -332,6 +361,9 @@ int main(int argc, char *argv[])
                     if (jj >= n) {
                         jj = 0;
                         ii++;
+                    }
+                    if (ii >= n) {
+                        mat2done = true;
                     }
                 }
                 
@@ -442,10 +474,10 @@ int main(int argc, char *argv[])
                 }
             }
             
-            //std::cout << LONG_MAX << "\n";
-            if (maxdist * maxflow >= ((LONG_MAX / n) / n) || maxdist * maxflow * n * n <= -((LONG_MAX / n) / n))
+            //std::cout << reallng_MAX << "\n";
+            if (maxdist * maxflow >= ((INT_FAST64_MAX / n) / n) || maxdist * maxflow * n * n <= -((INT_FAST64_MAX / n) / n))
             {
-                std::cout << "\tERROR: Invert potentially exceeds LONG_MAX, terminating" << "\n";
+                std::cout << "\tERROR: Invert potentially exceeds INT_FAST64_MAX, terminating" << "\n";
                 throw(-1);
             }
             
@@ -481,7 +513,7 @@ int main(int argc, char *argv[])
         
         if (forceSwap)
         {
-            ptr_long tmpptr;
+            ptr_reallng tmpptr;
             for (int i = 0; i < n; i++)
             {
                 tmpptr = dist[i];
@@ -578,21 +610,21 @@ int main(int argc, char *argv[])
         
 		
 		
-#ifdef BLS
+#ifdef ALGBLS
         std::cout << "BLS\n";
         jtc_interface_bls(qinput, qoutput);
 #endif
 
-#ifdef BMA
+#ifdef ALGBMA
         std::cout << "BMA\n";
         jtc_interface_bma(qinput, qoutput);
 #endif
 
-#ifdef ACO
+#ifdef ALGACO
 		std::cout << "MMAS\n";
 		fflush(stdout);
 		
-		
+#ifdef PREDEF_PLATFORM_UNIX
 		int save_out = dup(STDOUT_FILENO);
 		if(save_out == -1){
 			fprintf(stderr,"Error in dup(STDOUT_FILENO)\n");
@@ -611,16 +643,18 @@ int main(int argc, char *argv[])
 			fprintf(stderr,"Error in dup2(devNull, STDOUT_FILENO)\n");
 			exit(EXIT_FAILURE);
 		}
+#endif
 		
 		jtc_interface_aco(qinput, qoutput);
 		
-		
+#ifdef PREDEF_PLATFORM_UNIX
 		dup2(save_out, STDOUT_FILENO);
+#endif
 		
 		
 #endif
 
-        long bestvalue = 1e9;
+        reallng bestvalue = 1e9;
         double averagetime = 0;
         double averagesoln = 0;
         int nbest = 0;
@@ -647,8 +681,27 @@ int main(int argc, char *argv[])
         printf("ADJUSTEDSOLN:\n%.6f\n",(averagesoln / multAdjust) - invertAdjust - addAdjust);
         
         // TODO delete dist and flow.
+
+        delete qinput;
+
+        for (int i = 0; i < ntrials; i++)
+        {
+            delete qoutput[i];
+        }
+        delete[] qoutput;
+
+        
+        for (int i = 0; i < n; i++)
+        {
+            delete[] dist[i];
+            delete[] flow[i];
+        }
+        dist;
+        flow;
     
     }
+
+    delete[] algpars;
     
     return 0;
     

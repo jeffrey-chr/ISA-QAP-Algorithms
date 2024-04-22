@@ -21,19 +21,23 @@
 #include <map>
 #include<ctime>
 #include<cmath>
+#include<cstdint>
 
 #include "structs.h"
 
 
 #define mem_size 100000
-typedef int*   type_vector;
-typedef long** type_matrix;
 
-const long infinite = 999999999;
+typedef int_fast64_t reallng;
+
+typedef int*   type_vector;
+typedef reallng** type_matrix;
+
+const reallng infinite = 999999999;
 
 using namespace std;
 
-long iteration = 0;
+reallng iteration = 0;
 
 //BLS parameters
 /* double r1 = 0.7,r2 = 0.2; // Parameters used for directed perturbation. Number of moves elapsed before perturb. 
@@ -50,22 +54,22 @@ double P0;
 double Q=0.3;
 
 
-void transpose(int & a, int & b) {long temp = a; a = b; b = temp;}
+void transpose(int & a, int & b) {reallng temp = a; a = b; b = temp;}
 
 double global_maxtime;
 
-/* long global_best_solution;
+/* reallng global_best_solution;
 double global_time_for_best_solution;
-long global_best_solution_after_time;
+reallng global_best_solution_after_time;
 clock_t global_start; */
 
 /*--------------------------------------------------------------*/
 /*       compute the cost difference if elements i and j        */
 /*         are transposed in permutation (solution) p           */
 /*--------------------------------------------------------------*/
-long compute_delta(int n, type_matrix & a, type_matrix & b,
+reallng compute_delta(int n, type_matrix & a, type_matrix & b,
                    type_vector & p, int i, int j)
- {long d; int k;
+ {reallng d; int k;
   d = (a[i][i]-a[j][j])*(b[p[j]][p[j]]-b[p[i]][p[i]]) +
       (a[i][j]-a[j][i])*(b[p[j]][p[i]]-b[p[i]][p[j]]);
   for (k = 1; k <= n; k = k + 1) if (k!=i && k!=j)
@@ -78,7 +82,7 @@ long compute_delta(int n, type_matrix & a, type_matrix & b,
 /*      Idem, but the value of delta[i][j] is supposed to       */
 /*    be known before the transposition of elements r and s     */
 /*--------------------------------------------------------------*/
-long compute_delta_part(type_matrix & a, type_matrix & b,
+reallng compute_delta_part(type_matrix & a, type_matrix & b,
                         type_vector & p, type_matrix & delta, 
                         int i, int j, int r, int s)
   {return(delta[i][j]+(a[r][i]-a[r][j]+a[s][j]-a[s][i])*
@@ -86,7 +90,7 @@ long compute_delta_part(type_matrix & a, type_matrix & b,
      (a[i][r]-a[j][r]+a[j][s]-a[i][s])*
      (b[p[i]][p[s]]-b[p[j]][p[s]]+b[p[j]][p[r]]-b[p[i]][p[r]]) );
   }
-void update_matrix_of_move_cost(int i_retained, int j_retained,long n, type_matrix & delta, type_vector & p, type_matrix & a, type_matrix & b)
+void update_matrix_of_move_cost(int i_retained, int j_retained,reallng n, type_matrix & delta, type_vector & p, type_matrix & a, type_matrix & b)
 {
      int i, j;
      for (i = 1; i < n; i = i+1) for (j = i+1; j <= n; j = j+1)
@@ -99,8 +103,8 @@ void update_matrix_of_move_cost(int i_retained, int j_retained,long n, type_matr
          {delta[i][j] = compute_delta(n, a, b, p, i, j);};
 }
 
-void apply_move(type_vector & p,long n, type_matrix & delta, long & current_cost, type_matrix a, type_matrix b,
-		type_matrix & last_swaped, int & iter_without_improvement, long & best_cost, type_vector & best_sol, 
+void apply_move(type_vector & p,reallng n, type_matrix & delta, reallng & current_cost, type_matrix a, type_matrix b,
+		type_matrix & last_swaped, int & iter_without_improvement, reallng & best_cost, type_vector & best_sol, 
 		int i_retained, int j_retained, clock_t & end_time)
 {
 	if(i_retained!=-1 && j_retained!=-1) // apply the selected perturbation move
@@ -108,6 +112,7 @@ void apply_move(type_vector & p,long n, type_matrix & delta, long & current_cost
 		last_swaped[i_retained][j_retained] = iteration;
                 last_swaped[j_retained][i_retained] = iteration;
 		swap(p[i_retained], p[j_retained]);
+		reallng tmp = current_cost;
 		current_cost = current_cost + delta[i_retained][j_retained];
 		update_matrix_of_move_cost(i_retained, j_retained, n, delta, p, a, b);
 		if(current_cost<best_cost)
@@ -119,6 +124,10 @@ void apply_move(type_vector & p,long n, type_matrix & delta, long & current_cost
             // TODO actual output
 #ifdef DEBUG
 			 cout << "Solution of value " << best_cost<< " found. " <<iteration<< endl;
+			 for (int m = 1; m <= n; m = m + 1) cout << best_sol[m] << " ";
+			 cout << endl;
+			 cout << "Original current_cost: " << tmp << endl;
+			 cout << "Delta: " << delta[i_retained][j_retained] << endl;
 #endif
 
             /* if (global_best_solution_after_time != best_cost)
@@ -135,8 +144,8 @@ void apply_move(type_vector & p,long n, type_matrix & delta, long & current_cost
 		}
 	} iteration++;
 }
-void tabu_search_perturb(type_vector & p, long n, type_matrix & delta, long & current_cost, type_matrix a, type_matrix b,
-		type_matrix & last_swaped, int & iter_without_improvement, long & best_cost, type_vector & best_sol, long init_cost, 
+void tabu_search_perturb(type_vector & p, reallng n, type_matrix & delta, reallng & current_cost, type_matrix a, type_matrix b,
+		type_matrix & last_swaped, int & iter_without_improvement, reallng & best_cost, type_vector & best_sol, reallng init_cost, 
                 clock_t & end_time)
 {
 	int i_retained=-1, j_retained=-1,  i, j, min_delta;
@@ -155,8 +164,8 @@ void tabu_search_perturb(type_vector & p, long n, type_matrix & delta, long & cu
         };
 	apply_move(p,n, delta, current_cost, a, b, last_swaped, iter_without_improvement, best_cost, best_sol, i_retained, j_retained, end_time);  
 }
-void recency_based_perturb(type_vector & p, long n, type_matrix & delta, long & current_cost, type_matrix a, type_matrix b,
-		type_matrix & last_swaped, int & iter_without_improvement, long & best_cost, type_vector & best_sol, clock_t & end_time)
+void recency_based_perturb(type_vector & p, reallng n, type_matrix & delta, reallng & current_cost, type_matrix a, type_matrix b,
+		type_matrix & last_swaped, int & iter_without_improvement, reallng & best_cost, type_vector & best_sol, clock_t & end_time)
 {
 	int i, j, i_retained, j_retained, min = infinite;
 
@@ -173,8 +182,8 @@ void recency_based_perturb(type_vector & p, long n, type_matrix & delta, long & 
         };
 	apply_move(p,n, delta, current_cost, a, b, last_swaped, iter_without_improvement, best_cost, best_sol, i_retained, j_retained, end_time); 
 }
-void random_perturb(type_vector & p, long n, type_matrix & delta, long & current_cost, type_matrix a, type_matrix b,
-		type_matrix & last_swaped, int & iter_without_improvement, long & best_cost, type_vector & best_sol, long init_cost, clock_t & end_time)
+void random_perturb(type_vector & p, reallng n, type_matrix & delta, reallng & current_cost, type_matrix a, type_matrix b,
+		type_matrix & last_swaped, int & iter_without_improvement, reallng & best_cost, type_vector & best_sol, reallng init_cost, clock_t & end_time)
 {
 	int i_retained = 1+rand()%n;
         int j_retained = 1+rand()%n;
@@ -188,11 +197,11 @@ void random_perturb(type_vector & p, long n, type_matrix & delta, long & current
         }
 	apply_move(p, n, delta, current_cost, a, b, last_swaped, iter_without_improvement, best_cost, best_sol, i_retained, j_retained, end_time); 
 }
-void perturbe(type_vector & p,long n, type_matrix & delta, long & current_cost, type_matrix & a, type_matrix & b,
-             type_matrix & last_swaped,  int & iter_without_improvement, type_vector & best_sol, long & best_cost, clock_t & end_time)
+void perturbe(type_vector & p,reallng n, type_matrix & delta, reallng & current_cost, type_matrix & a, type_matrix & b,
+             type_matrix & last_swaped,  int & iter_without_improvement, type_vector & best_sol, reallng & best_cost, clock_t & end_time)
 {
    int i_retained=-1, j_retained=-1, k, i, j, min_delta, min;
-   long cost = current_cost; 
+   reallng cost = current_cost; 
 
    double d = static_cast<double>(iter_without_improvement)/T;
    double e = pow(2.718, -d);
@@ -221,18 +230,18 @@ void perturbe(type_vector & p,long n, type_matrix & delta, long & current_cost, 
    }
 }
 
-void allocate_memory_and_initialize(type_vector & p, long n, type_matrix & delta, type_matrix & last_swaped, long & current_cost, 
-		type_matrix a, type_matrix b, type_vector & best_sol, long & best_cost)
+void allocate_memory_and_initialize(type_vector & p, reallng n, type_matrix & delta, type_matrix & last_swaped, reallng & current_cost, 
+		type_matrix a, type_matrix b, type_vector & best_sol, reallng & best_cost)
 {
 	int i, j;
 	/***************** dynamic memory allocation *******************/
 	p = new int[n+1];
-	delta = new long* [n+1];
-	last_swaped = new long* [n+1];
+	delta = new reallng* [n+1];
+	last_swaped = new reallng* [n+1];
 	for (i = 1; i <= n; i = i+1)
 	{ 
-		delta[i] = new long[n+1]; 
-		last_swaped[i] = new long [n+1];
+		delta[i] = new reallng[n+1]; 
+		last_swaped[i] = new reallng [n+1];
 	}
 	/************** current solution initialization ****************/
 	for (i = 1; i <= n; i = i + 1) 
@@ -271,11 +280,11 @@ void allocate_memory_and_initialize(type_vector & p, long n, type_matrix & delta
     }*/
 }
 
-bool best_improvement_move(type_vector & p,long n, type_matrix & delta, long & current_cost, type_matrix a, type_matrix b,
-		type_matrix & last_swaped, int & iter_without_improvement, long & best_cost, type_vector & best_sol, clock_t & end_time)
+bool best_improvement_move(type_vector & p,reallng n, type_matrix & delta, reallng & current_cost, type_matrix a, type_matrix b,
+		type_matrix & last_swaped, int & iter_without_improvement, reallng & best_cost, type_vector & best_sol, clock_t & end_time)
 {
     int i, j, i_retained, j_retained;
-    long min_delta = infinite;   // retained move cost
+    reallng min_delta = infinite;   // retained move cost
     //select the best swap move for the descent local search phase 
     for (i = 1; i < n; i = i + 1)
     { 
@@ -296,8 +305,8 @@ bool best_improvement_move(type_vector & p,long n, type_matrix & delta, long & c
     }else
 		return 0;
 }  
-void determine_jump_magnitude(int & iter_without_improvement, int descent_num, long previous_cost,
-		long current_cost, long n)
+void determine_jump_magnitude(int & iter_without_improvement, int descent_num, reallng previous_cost,
+		reallng current_cost, reallng n)
 {
 	//the following lines determine the number of perturbation moves (jump magnitude)
 	if(iter_without_improvement>T) // if the best found solution is not improved during the last T descent phases 
@@ -317,20 +326,19 @@ void determine_jump_magnitude(int & iter_without_improvement, int descent_num, l
 		perturb_str+= 1;
 	}
 }     
-void BLS(long n,                  // problem size
+void BLS(reallng n,                  // problem size
 		type_matrix  a,         // flows matrix
 		type_matrix  b,         // distance matrix
 		type_vector & best_sol,  // best solution found
-		long & best_cost,      // cost of best solution
-                long num_iterations, long best_objective, clock_t & end_time)
-
+		reallng & best_cost,      // cost of best solution
+                reallng num_iterations, reallng best_objective, clock_t & end_time)
 {
 	type_vector p;                        // current solution
 	type_matrix delta;                   
 	type_matrix last_swaped; // keeps track of the iteration number when a move was last performed
 
-	long current_iteration;              
-	long current_cost, previous_cost;    // current sol. value and previous sol. value
+	reallng current_iteration;              
+	reallng current_cost, previous_cost;    // current sol. value and previous sol. value
 	int descent_num;
 	int iter_without_improvement = 0; // counter of the number of consecutive descent phases with no improvement of the best solution 
 	perturb_str = ceil(init_pert_str*n); // initialize the number of perturbation moves
@@ -377,21 +385,21 @@ void BLS(long n,                  // problem size
 	delete[] delta;  delete [] last_swaped;
 } // BLS
 
-void generate_random_solution(long n, type_vector  & p)
+void generate_random_solution(reallng n, type_vector  & p)
 {
   int i;
   for (i = 0; i <= n; i = i+1) p[i] = i;
   for (i = 1; i <  n; i = i+1) transpose(p[i], p[i + rand()%(n-i+1)]);
 }
-void load_problem( int &n, type_matrix &a, type_matrix &b, long & best_objective)
+void load_problem( int &n, type_matrix &a, type_matrix &b, reallng & best_objective)
 {
 	cin >> best_objective >> n; 
-	a = new long* [n+1];
-	b = new long* [n+1];
+	a = new reallng* [n+1];
+	b = new reallng* [n+1];
 	for (int i = 1; i <= n; i = i+1) 
 	{
-		a[i] = new long[n+1];
-		b[i] = new long[n+1];
+		a[i] = new reallng[n+1];
+		b[i] = new reallng[n+1];
 	}
 
 	for (int i = 1; i <= n; i = i+1) 
@@ -405,7 +413,7 @@ void load_problem( int &n, type_matrix &a, type_matrix &b, long & best_objective
 int n;                    // problem size
 type_matrix a, b;         // flows and distances matrices
 type_vector solution;     // solution (permutation) 
-long cost, best_objective;                // solution cost
+reallng cost, best_objective;                // solution cost
 int i, j; //variables for iterations
 
 
@@ -417,7 +425,7 @@ int i, j; //variables for iterations
 	solution = new int[n+1];
 	************** generate random solution and run BLS algorithm **************
 
-        long num_iterations = 2000000000;
+        reallng num_iterations = 2000000000;
         clock_t time;
 
 	generate_random_solution(n, solution); 
@@ -439,12 +447,12 @@ int jtc_interface_bls(QAP_input* qinput, QAP_output** qoutput)
     int num_runs = qinput->ntrials;
     
     n = qinput->n;
-    a = new long* [n+1];
-	b = new long* [n+1];
+    a = new reallng* [n+1];
+	b = new reallng* [n+1];
 	for (int i = 1; i <= n; i = i+1) 
 	{
-		a[i] = new long[n+1];
-		b[i] = new long[n+1];
+		a[i] = new reallng[n+1];
+		b[i] = new reallng[n+1];
 	}
     
     for (int i = 1; i <= n; i = i+1) 
@@ -494,7 +502,7 @@ int jtc_interface_bls(QAP_input* qinput, QAP_output** qoutput)
 	
 	/************** generate random solution and run BLS algorithm **************/
 
-    long num_iterations = 2000000000;
+    reallng num_iterations = 2000000000;
     
     for (int p=0; p<num_runs; p++)
     {
