@@ -45,69 +45,68 @@ typedef reallng*   ptr_reallng;
 
 #include "structs.h"
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-	int ntrials = 1;
-	
+    int ntrials = 1;
+    bool indtrials = false;
+    int thisindtrial = -1;
+    int maxindtrial = -1;
+
     bool reduce = false;
     bool reduceA = false;
     bool reduceB = false;
-    
+
     reallng additive = 0;
     reallng additiveADiag = 0;
     reallng additiveAElse = 0;
     reallng additiveBDiag = 0;
     reallng additiveBElse = 0;
-    
+
     reallng addAdjust = 0;
-    
+
     bool invert = false;
-    
+
     reallng invertAdjust = 0;
-    
+
     reallng multiplier = 1;
     reallng multiplierA = 1;
     reallng multiplierB = 1;
-    
+
     reallng multAdjust = 1;
-    
+
     bool forceSwap = false;
-	
-	bool scramble = false;
+
+    bool scramble = false;
 
     int n;
     reallng** dist;
     reallng** flow;
     reallng maxdist = 0;
     reallng maxflow = 0;
-    
-    reallng mindistdiag = (reallng) 1e9;
-    reallng minflowdiag = (reallng) 1e9;
-    reallng mindistelse = (reallng) 1e9;
-    reallng minflowelse = (reallng) 1e9;
+
+    reallng mindistdiag = (reallng)1e9;
+    reallng minflowdiag = (reallng)1e9;
+    reallng mindistelse = (reallng)1e9;
+    reallng minflowelse = (reallng)1e9;
     reallng tracedist = 0;
     reallng traceflow = 0;
     reallng offsumdist = 0;
     reallng offsumflow = 0;
-    
-    printf("argc is %d\n", argc);
 
-    if(argc>=2)
-    {
-        printf("INSTANCENAME:\n%s\n",argv[1]);
-    }
-    else
+    // printf("argc is %d\n", argc);
+
+    if (argc < 2)
     {
         printf("No file name provided");
         throw(-1);
     }
-    
+
     const char* path = argv[1];
-	
-	std::string algparamstring = "";
-    
+
+    std::string algparamstring = "";
+
     // Some quick and dirty command line parameters for modifying the instance.
-    
+
     if (argc >= 3)
     {
         for (int i = 2; i < argc; i++)
@@ -177,17 +176,30 @@ int main(int argc, char *argv[])
             if (std::strcmp(argv[i], "-swap") == 0) {
                 forceSwap = true;
             }
-			if (std::strcmp(argv[i], "-scramble") == 0) {
+            if (std::strcmp(argv[i], "-scramble") == 0) {
                 scramble = true;
             }
-			if (std::strcmp(argv[i], "-trials") == 0) {
+            if (std::strcmp(argv[i], "-trials") == 0) {
                 i++;
                 if (i < argc)
                 {
                     ntrials = std::stoi(argv[i]);
                 }
             }
-			if (std::strcmp(argv[i], "-algparams") == 0) {
+            if (std::strcmp(argv[i], "-indtrial") == 0) {
+                indtrials = true;
+                i++;
+                if (i < argc)
+                {
+                    thisindtrial = std::stoi(argv[i]);
+                }
+                i++;
+                if (i < argc)
+                {
+                    maxindtrial = std::stoi(argv[i]);
+                }
+            }
+            if (std::strcmp(argv[i], "-algparams") == 0) {
                 i++;
                 if (i < argc)
                 {
@@ -196,100 +208,100 @@ int main(int argc, char *argv[])
             }
         }
     }
-    
-	if (scramble) { std::srand ( unsigned ( std::time(0) ) ); }
-	
+
+    if (scramble) { std::srand(unsigned(std::time(0))); }
+
     if (reduce) { reduceA = true; reduceB = true; }
-	
-    
+
+
     additiveADiag += additive;
     additiveAElse += additive;
     additiveBDiag += additive;
     additiveBElse += additive;
-    
+
     multiplierA *= multiplier;
     multiplierB *= multiplier;
-    
-	//
-	int nalgpar = 0;
-	double* algpars;
-	if (algparamstring.length() > 0)
-	{
-		nalgpar = 1;
-		std::size_t found = algparamstring.find_first_of(",");
-		while (found!=std::string::npos)
-		{
-			nalgpar++;
-			found = algparamstring.find_first_of(",", found+1);
-		}
-		//std::cout << "nalgpar: " << nalgpar << "\n";
-		algpars = new double[nalgpar];
-		for (int j = 0; j < nalgpar; j++) { algpars[j] = -1; }
-		std::size_t start = 0;
-		found = algparamstring.find_first_of(",");
-		int i = 0;
-		while (found!=std::string::npos && i < nalgpar)
-		{
-			algpars[i] = std::stod(algparamstring.substr(start,found-start));
-			i = i + 1;
-			start = found+1;
-			found = algparamstring.find_first_of(",", found+1);
-		}
-		algpars[i] = std::stod(algparamstring.substr(start,std::string::npos));
-	}
+
+    //
+    int nalgpar = 0;
+    double* algpars;
+    if (algparamstring.length() > 0)
+    {
+        nalgpar = 1;
+        std::size_t found = algparamstring.find_first_of(",");
+        while (found != std::string::npos)
+        {
+            nalgpar++;
+            found = algparamstring.find_first_of(",", found + 1);
+        }
+        //std::cout << "nalgpar: " << nalgpar << "\n";
+        algpars = new double[nalgpar];
+        for (int j = 0; j < nalgpar; j++) { algpars[j] = -1; }
+        std::size_t start = 0;
+        found = algparamstring.find_first_of(",");
+        int i = 0;
+        while (found != std::string::npos && i < nalgpar)
+        {
+            algpars[i] = std::stod(algparamstring.substr(start, found - start));
+            i = i + 1;
+            start = found + 1;
+            found = algparamstring.find_first_of(",", found + 1);
+        }
+        algpars[i] = std::stod(algparamstring.substr(start, std::string::npos));
+    }
     else
     {
         algpars = new double[1];
     }
 
     //
-    
+
     std::ifstream myfile;
     myfile.open(path);
-    
+
     std::string line;
     std::string entry;
     int ientry;
-    
+
     std::string delimiter = " ";
-    
+
     if (myfile.is_open())
-	{    
-		getline (myfile, line);
+    {
+        getline(myfile, line);
         while (line.find_first_not_of(' ') == std::string::npos)
-        {   
+        {
             // This line contains only whitespace. Get the next one.
-            getline (myfile, line);
+            getline(myfile, line);
         }
-        
+
         // This line should contain one positive integer, n.
         {
             std::istringstream iss(line);
             iss >> entry;
             n = std::stoi(entry);
         }
-        
+
         dist = new ptr_reallng[n];
         flow = new ptr_reallng[n];
         for (int i = 0; i < n; i++)
         {
             dist[i] = new reallng[n];
             flow[i] = new reallng[n];
-        }            
-        
-        getline (myfile, line);
-        while (line.find_first_not_of(' ') == std::string::npos)
-        {   
-            // This line contains only whitespace. Get the next one.
-            getline (myfile, line);
         }
-        
-        
+
+        getline(myfile, line);
+        while (line.find_first_not_of(' ') == std::string::npos)
+        {
+            // This line contains only whitespace. Get the next one.
+            getline(myfile, line);
+        }
+
+
         // READ THE FIRST MATRIX
         int ii = 0;
         int jj = 0;
         while (line.find_first_not_of(' ') != std::string::npos && (jj != 0 || ii != n))
-        {   
+        {
             bool mat1done = false;
             // This line contains non-whitespace - read it.
             std::istringstream iss(line);
@@ -300,7 +312,7 @@ int main(int argc, char *argv[])
                 {
                     dist[ii][jj] = ientry;
                     maxdist = (maxdist > ientry ? maxdist : ientry);
-                    
+
                     if (ii == jj) {
                         mindistdiag = (mindistdiag < ientry ? mindistdiag : ientry);
                         tracedist += ientry;
@@ -310,7 +322,7 @@ int main(int argc, char *argv[])
                         mindistelse = (mindistelse < ientry ? mindistelse : ientry);
                         offsumdist += ientry;
                     }
-                    
+
                     jj++;
                     if (jj >= n) {
                         jj = 0;
@@ -321,21 +333,21 @@ int main(int argc, char *argv[])
                     }
                 }
             }
-            getline (myfile, line);
+            getline(myfile, line);
         }
         if (jj != 0 || ii != n) { throw (-1); }
-        
+
         while (line.find_first_not_of(' ') == std::string::npos)
-        {   
+        {
             // This line contains only whitespace. Get the next one.
-            getline (myfile, line);
+            getline(myfile, line);
         }
-        
+
         // READ THE SECOND MATRIX
         ii = 0;
         jj = 0;
         while (line.find_first_not_of(' ') != std::string::npos && (jj != 0 || ii != n))
-        {   
+        {
             bool mat2done = false;
             // This line contains non-whitespace - read it.
             std::istringstream iss(line);
@@ -346,7 +358,7 @@ int main(int argc, char *argv[])
                 {
                     flow[ii][jj] = ientry;
                     maxflow = (maxflow > ientry ? maxflow : ientry);
-                    
+
                     if (ii == jj) {
                         minflowdiag = (minflowdiag < ientry ? minflowdiag : ientry);
                         traceflow += ientry;
@@ -356,7 +368,7 @@ int main(int argc, char *argv[])
                         minflowelse = (minflowelse < ientry ? minflowelse : ientry);
                         offsumflow += ientry;
                     }
-                    
+
                     jj++;
                     if (jj >= n) {
                         jj = 0;
@@ -366,38 +378,42 @@ int main(int argc, char *argv[])
                         mat2done = true;
                     }
                 }
-                
+
             }
-            getline (myfile, line);
+            getline(myfile, line);
         }
         if (jj != 0 || ii != n) { throw (-1); }
-    
+
         myfile.close();
-        
+
 #ifdef DEBUG
         ntrials = 1;
 #endif
-        
+
         double maxtime = 0;
-        
+
 #ifdef BENCH
-        maxtime = 8*n + 20;
+        maxtime = 8 * n + 20;
         if (n <= 5)
-            { maxtime = 120; }
+        {
+            maxtime = 120;
+        }
         else
-            { maxtime = 1200; }
+        {
+            maxtime = 1200;
+        }
 #else
         //maxtime = 0.0228*(n*n) - 1.3722*n + 18.8760;
-		//maxtime = 0.001*((n-25)*(n-25)*(n-25)) - 0.085*((n-25)*(n-25)) + 4.45*(n-25) - 14.7;
-	maxtime = 0.0445*((n-25)*(n-25)) + 0.9471*(n-25) +7.6896;
-	if (maxtime < 5)
-        { 
-            maxtime = 5; 
+        //maxtime = 0.001*((n-25)*(n-25)*(n-25)) - 0.085*((n-25)*(n-25)) + 4.45*(n-25) - 14.7;
+        maxtime = 0.0445 * ((n - 25) * (n - 25)) + 0.9471 * (n - 25) + 7.6896;
+        if (maxtime < 5)
+        {
+            maxtime = 5;
         }
 #endif
 
 #ifdef DEBUG
-            maxtime = 10;
+        maxtime = 10;
 #endif
 
         if (reduceA) {
@@ -405,13 +421,13 @@ int main(int argc, char *argv[])
             additiveADiag -= mindistdiag;
             additiveAElse -= mindistelse;
         }
-        
+
         if (reduceB) {
             std::cout << "**** Reducing second matrix" << "\n";
             additiveBDiag -= minflowdiag;
             additiveBElse -= minflowelse;
         }
-        
+
         if (additiveADiag != 0 || additiveAElse != 0 || additiveBDiag != 0 || additiveBElse != 0)
         {
             std::cout << "**** Applying additive changes to problem matrices" << "\n";
@@ -419,10 +435,10 @@ int main(int argc, char *argv[])
             std::cout << "\tadditiveAElse: " << additiveAElse << "\n";
             std::cout << "\tadditiveBDiag: " << additiveBDiag << "\n";
             std::cout << "\tadditiveBElse: " << additiveBElse << "\n";
-            
+
             for (int i = 0; i < n; i++)
             {
-                for (int j = i+1; j < n; j++)
+                for (int j = i + 1; j < n; j++)
                 {
                     dist[i][j] += additiveAElse;
                     flow[i][j] += additiveBElse;
@@ -432,15 +448,15 @@ int main(int argc, char *argv[])
                 dist[i][i] += additiveADiag;
                 flow[i][i] += additiveBDiag;
             }
-            
-            addAdjust = (additiveBDiag * tracedist) + (additiveADiag * traceflow) + (n * additiveADiag * additiveBDiag) + (additiveBElse * offsumdist) + (additiveAElse * offsumflow) + (n * (n-1) * additiveBElse * additiveAElse);
+
+            addAdjust = (additiveBDiag * tracedist) + (additiveADiag * traceflow) + (n * additiveADiag * additiveBDiag) + (additiveBElse * offsumdist) + (additiveAElse * offsumflow) + (n * (n - 1) * additiveBElse * additiveAElse);
             std::cout << "\tAdditive step adjustment to objective: " << addAdjust << "\n";
         }
-        
+
         if (invert)
         {
             std::cout << "**** Inverting both data matrices" << "\n";
-            
+
             // Unfortunately we need to recalculate these after the additive change. 
             // Could do some of them a little more cleverly but this will be fast enough.
             maxdist = -1e9;
@@ -456,7 +472,7 @@ int main(int argc, char *argv[])
                     maxdist = (maxdist > dist[i][j] ? maxdist : dist[i][j]);
                     maxflow = (maxflow > flow[i][j] ? maxflow : flow[i][j]);
                 }
-                for (int j = i+1; j < n; j++)
+                for (int j = i + 1; j < n; j++)
                 {
                     offsumdist -= dist[i][j] + dist[j][i];
                     offsumflow -= flow[i][j] + flow[j][i];
@@ -464,7 +480,7 @@ int main(int argc, char *argv[])
                 tracedist -= dist[i][i];
                 traceflow -= flow[i][i];
             }
-            
+
             for (int i = 0; i < n; i++)
             {
                 for (int j = 0; j < n; j++)
@@ -473,24 +489,24 @@ int main(int argc, char *argv[])
                     flow[i][j] = maxflow - flow[i][j];
                 }
             }
-            
+
             //std::cout << reallng_MAX << "\n";
             if (maxdist * maxflow >= ((INT_FAST64_MAX / n) / n) || maxdist * maxflow * n * n <= -((INT_FAST64_MAX / n) / n))
             {
                 std::cout << "\tERROR: Invert potentially exceeds INT_FAST64_MAX, terminating" << "\n";
                 throw(-1);
             }
-            
+
             std::cout << "\tCurrent maxdist: " << maxdist << "\n";
             std::cout << "\tCurrent maxflow: " << maxflow << "\n";
             std::cout << "\tCurrent tracedist: " << tracedist << "\n";
             std::cout << "\tCurrent traceflow: " << traceflow << "\n";
             std::cout << "\tCurrent offsumdist: " << offsumdist << "\n";
             std::cout << "\tCurrent offsumflow: " << offsumflow << "\n";
-            
-            invertAdjust = (maxflow * tracedist) + (maxdist * traceflow) + (n * maxdist * maxflow) + (maxflow * offsumdist) + (maxdist * offsumflow) + (n * (n-1) * maxflow * maxdist);
+
+            invertAdjust = (maxflow * tracedist) + (maxdist * traceflow) + (n * maxdist * maxflow) + (maxflow * offsumdist) + (maxdist * offsumflow) + (n * (n - 1) * maxflow * maxdist);
             std::cout << "\tInversion step adjustment to objective: " << invertAdjust << "\n";
-            
+
         }
 
         if (multiplierA != 1 || multiplierB != 1)
@@ -498,7 +514,7 @@ int main(int argc, char *argv[])
             std::cout << "**** Multiplying data matrices" << "\n";
             std::cout << "\tMultiplier for first matrix: " << multiplierA << "\n";
             std::cout << "\tMultiplier for second matrix: " << multiplierB << "\n";
-            
+
             for (int i = 0; i < n; i++)
             {
                 for (int j = 0; j < n; j++)
@@ -510,7 +526,7 @@ int main(int argc, char *argv[])
             multAdjust = multiplierA * multiplierB;
             std::cout << "\tMultiplier adjustment to objective: " << multAdjust << "\n";
         }
-        
+
         if (forceSwap)
         {
             ptr_reallng tmpptr;
@@ -519,109 +535,121 @@ int main(int argc, char *argv[])
                 tmpptr = dist[i];
                 dist[i] = flow[i];
                 flow[i] = tmpptr;
-            } 
+            }
         }
-        
+
         QAP_input* qinput = new QAP_input(n, dist, flow, maxtime, ntrials, nalgpar, algpars);
-    
-        QAP_output** qoutput = new QAP_output*[ntrials];
+
+        QAP_output** qoutput = new QAP_output * [ntrials];
         for (int i = 0; i < ntrials; i++)
         {
-            qoutput[i] = new QAP_output(1e9,1e9);
+            qoutput[i] = new QAP_output(1e9, 1e9);
         }
-    
-        std::cout << "INSTANCESIZE:\n";
-        std::cout << n << "\n";
-        std::cout << "MAXTIME:\n" << maxtime << "\n";
-		std::cout << "ALGPARAMETERS:" << "\n";
-		for (int i = 0; i < nalgpar; i++) {
-			std::cout << algpars[i] << " ";
-		}
-		std::cout << '\n';
-        std::cout << "ALGORITHMNAME:\n";
-    
+
+        if (!indtrials || thisindtrial == 1)
+        {
+            printf("INSTANCENAME:\n%s\n", argv[1]);
+            std::cout << "INSTANCESIZE:\n";
+            std::cout << n << "\n";
+            std::cout << "MAXTIME:\n" << maxtime << "\n";
+            std::cout << "ALGPARAMETERS:" << "\n";
+            for (int i = 0; i < nalgpar; i++) {
+                std::cout << algpars[i] << " ";
+            }
+            std::cout << '\n';
+            std::cout << "ALGORITHMNAME:\n";
+        }
+
 #ifdef NONE
-		std::cout << "HANDLERTEST\n";
-        int mxline = 25;
-		
-        std::cout << n << "\n";
-        if (n < mxline)
+    if (!indtrials || thisindtrial == 1) {
+        std::cout << "HANDLERTEST\n";
+    }
+    int mxline = 25;
+
+    std::cout << n << "\n";
+    if (n < mxline)
+    {
+        for (int i = 0; i < n; i++)
         {
-            for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
             {
-                for (int j = 0; j < n; j++)
-                {
-                    std::cout << dist[i][j] << " ";
-                }
-                std::cout << '\n';
+                std::cout << dist[i][j] << " ";
             }
             std::cout << '\n';
-            for (int i = 0; i < n; i++)
-            {
-                for (int j = 0; j < n; j++)
-                {
-                    std::cout << flow[i][j] << " ";
-                }
-                std::cout << '\n';
-            }
         }
-        else
+        std::cout << '\n';
+        for (int i = 0; i < n; i++)
         {
-            for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
             {
-                for (int j = 0; j < mxline-7; j++)
-                {
-                    std::cout << dist[i][j] << " ";
-                }
-                std::cout << "... ";
-                for (int j = n-5; j < n; j++)
-                {
-                    std::cout << dist[i][j] << " ";
-                }
-                std::cout << '\n';
+                std::cout << flow[i][j] << " ";
             }
             std::cout << '\n';
-            for (int i = 0; i < n; i++)
-            {
-                for (int j = 0; j < mxline-7; j++)
-                {
-                    std::cout << flow[i][j] << " ";
-                }
-                std::cout << "... ";
-                for (int j = n-5; j < n; j++)
-                {
-                    std::cout << flow[i][j] << " ";
-                }
-                std::cout << '\n';
-            }
         }
-        
-        return 0;
+    }
+    else
+    {
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < mxline - 7; j++)
+            {
+                std::cout << dist[i][j] << " ";
+            }
+            std::cout << "... ";
+            for (int j = n - 5; j < n; j++)
+            {
+                std::cout << dist[i][j] << " ";
+            }
+            std::cout << '\n';
+        }
+        std::cout << '\n';
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < mxline - 7; j++)
+            {
+                std::cout << flow[i][j] << " ";
+            }
+            std::cout << "... ";
+            for (int j = n - 5; j < n; j++)
+            {
+                std::cout << flow[i][j] << " ";
+            }
+            std::cout << '\n';
+        }
+    }
+
+    return 0;
 #endif
 
-        if (maxdist == 0) {
-            std::cout << "ABORTING: Distance matrix is all zeros";
-            return 0;
-        }
-        if (maxflow == 0) {
-            std::cout << "ABORTING: Flow matrix is all zeros";
-            return 0;
-        }
-        
-		
-		
+    if (maxdist == 0) {
+        std::cout << "ABORTING: Distance matrix is all zeros";
+        return 0;
+    }
+    if (maxflow == 0) {
+        std::cout << "ABORTING: Flow matrix is all zeros";
+        return 0;
+    }
+
+
+
 #ifdef ALGBLS
+    if (!indtrials || thisindtrial == 1) {
         std::cout << "BLS\n";
-        jtc_interface_bls(qinput, qoutput);
+    }
+jtc_interface_bls(qinput, qoutput);
 #endif
 
 #ifdef ALGBMA
+    if (!indtrials || thisindtrial == 1) {
         std::cout << "BMA\n";
+    }
         jtc_interface_bma(qinput, qoutput);
 #endif
 
 #ifdef ALGACO
-		std::cout << "MMAS\n";
+        if (!indtrials || thisindtrial == 1) {
+            std::cout << "MMAS\n";
+        }
 		fflush(stdout);
 		
 #ifdef PREDEF_PLATFORM_UNIX
@@ -658,27 +686,48 @@ int main(int argc, char *argv[])
         double averagetime = 0;
         double averagesoln = 0;
         int nbest = 0;
-		
-		std::cout << "TRIALS:\n";
+        if (!indtrials || thisindtrial == 1) {
+            std::cout << "TRIALS:\n";
+        }
         for (int i = 0; i < ntrials; i++)
         {
-            std::cout << "Trial" << i << "," << qoutput[i]->value << "," << ((qoutput[i]->value / multAdjust) - invertAdjust - addAdjust) << "," << qoutput[i]->time_for_best << "s\n";
+            if (!indtrials || thisindtrial == 1)
+            {
+                std::cout << "Trial" << i << "," << qoutput[i]->value << "," << ((qoutput[i]->value / multAdjust) - invertAdjust - addAdjust) << "," << qoutput[i]->time_for_best << "s\n";
+            }
+            else
+            {
+                std::cout << "Trial" << thisindtrial-1 << "," << qoutput[i]->value << "," << ((qoutput[i]->value / multAdjust) - invertAdjust - addAdjust) << "," << qoutput[i]->time_for_best << "s\n";
+            }
             averagetime += qoutput[i]->time_for_best;
             averagesoln += qoutput[i]->value;
             nbest++;
         }
-		std::cout << "TRIALSEND\n";
+        if (!indtrials || thisindtrial == maxindtrial) {
+            std::cout << "TRIALSEND\n";
+        }
         assert(nbest > 0);
         averagetime = averagetime / nbest;
         averagesoln = averagesoln / nbest;
-        std::cout << "AVERAGETIMEFORBEST:\n" << averagetime << "\n";
+        if (!indtrials)
+        {
+            std::cout << "AVERAGETIMEFORBEST:\n" << averagetime << "\n";
 #ifdef BENCH
-        if (averagetime > 0.75*maxtime) {std::cout << "WARNING: may not have given enough time\n";}
+            if (averagetime > 0.75 * maxtime) { std::cout << "WARNING: may not have given enough time\n"; }
 #endif
-        
-        printf("AVERAGESOLN:\n%.6f\n",averagesoln);
-        
-        printf("ADJUSTEDSOLN:\n%.6f\n",(averagesoln / multAdjust) - invertAdjust - addAdjust);
+
+            printf("AVERAGESOLN:\n%.6f\n", averagesoln);
+
+            printf("ADJUSTEDSOLN:\n%.6f\n", (averagesoln / multAdjust) - invertAdjust - addAdjust);
+        }
+        else
+        {
+            if (thisindtrial == maxindtrial) {
+                printf("MULTADJUST:\n%d\n", multAdjust);
+                printf("INVERTADJUST:\n%d\n", invertAdjust);
+                printf("ADDADJUST:\n%d\n", addAdjust);
+            }
+        }
         
         // TODO delete dist and flow.
 
@@ -696,8 +745,8 @@ int main(int argc, char *argv[])
             delete[] dist[i];
             delete[] flow[i];
         }
-        dist;
-        flow;
+        delete[] dist;
+        delete[] flow;
     
     }
 

@@ -882,7 +882,7 @@ int i, j;
      
      }end:
     
-      cout<<"Res cost "<<resulting_cost<<"  "<<time_best<<endl;
+      //cout<<"Res cost "<<resulting_cost<<"  "<<time_best<<endl;
      
       qoutput[p]->value = resulting_cost;
       qoutput[p]->time_for_best = time_best;
