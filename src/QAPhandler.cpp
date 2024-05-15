@@ -77,6 +77,8 @@ int main(int argc, char* argv[])
     bool forceSwap = false;
 
     bool scramble = false;
+	
+	bool trashStdOut = true;
 
     int n;
     reallng** dist;
@@ -113,6 +115,9 @@ int main(int argc, char* argv[])
         {
             if (std::strcmp(argv[i], "-reduce") == 0) {
                 reduce = true;
+            }
+			if (std::strcmp(argv[i], "-donttrash") == 0) {
+                trashStdOut = false;
             }
             if (std::strcmp(argv[i], "-addall") == 0) {
                 i++;
@@ -653,30 +658,36 @@ jtc_interface_bls(qinput, qoutput);
 		fflush(stdout);
 		
 #ifdef PREDEF_PLATFORM_UNIX
-		int save_out = dup(STDOUT_FILENO);
-		if(save_out == -1){
-			fprintf(stderr,"Error in dup(STDOUT_FILENO)\n");
-			exit(EXIT_FAILURE);
-		}
-
-		int devNull = open("/dev/null",O_WRONLY);
-		if(devNull == -1){
-			fprintf(stderr,"Error in open('/dev/null',0)\n");
-			exit(EXIT_FAILURE);
-		}
-
-		
-		int dup2Result = dup2(devNull, STDOUT_FILENO);
-		if(dup2Result == -1) {
-			fprintf(stderr,"Error in dup2(devNull, STDOUT_FILENO)\n");
-			exit(EXIT_FAILURE);
+		int save_out = -99;
+		int devNull = -99;
+		int dup2Result = -99;
+		if (trashStdOut) {
+			save_out = dup(STDOUT_FILENO);
+			if(save_out == -1){
+				fprintf(stderr,"Error in dup(STDOUT_FILENO)\n");
+				exit(EXIT_FAILURE);
+			}
+			
+			devNull = open("/dev/null",O_WRONLY);
+			if(devNull == -1){
+				fprintf(stderr,"Error in open('/dev/null',0)\n");
+				exit(EXIT_FAILURE);
+			}
+			
+			dup2Result = dup2(devNull, STDOUT_FILENO);
+			if(dup2Result == -1) {
+				fprintf(stderr,"Error in dup2(devNull, STDOUT_FILENO)\n");
+				exit(EXIT_FAILURE);
+			}
 		}
 #endif
 		
 		jtc_interface_aco(qinput, qoutput);
 		
 #ifdef PREDEF_PLATFORM_UNIX
-		dup2(save_out, STDOUT_FILENO);
+		if (trashStdOut) {
+			dup2(save_out, STDOUT_FILENO);
+		}
 #endif
 		
 		
