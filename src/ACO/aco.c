@@ -561,8 +561,6 @@ int main(int argc, char *argv[])
 	init_try(n_try);
         write_report(); /* we print the initial heuristic solution.  */
 		
-	printf("TEMPORARY: ls_flag is %f", ls_flag);
-		
 	while ( !termination_condition() ) {
 		
 	    construct_solutions();
