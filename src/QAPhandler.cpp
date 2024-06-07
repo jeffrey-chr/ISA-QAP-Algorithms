@@ -405,7 +405,7 @@ int main(int argc, char* argv[])
         }
         else
         {
-            maxtime = 1200;
+            maxtime = 2400;
         }
 #else
         //maxtime = 0.0228*(n*n) - 1.3722*n + 18.8760;
@@ -724,7 +724,7 @@ jtc_interface_bls(qinput, qoutput);
         {
             std::cout << "AVERAGETIMEFORBEST:\n" << averagetime << "\n";
 #ifdef BENCH
-            if (averagetime > 0.75 * maxtime) { std::cout << "WARNING: may not have given enough time\n"; }
+            //if (averagetime > 0.75 * maxtime) { std::cout << "WARNING: may not have given enough time\n"; }
 #endif
 
             printf("AVERAGESOLN:\n%.6f\n", averagesoln);

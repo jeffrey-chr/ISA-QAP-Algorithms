@@ -560,7 +560,6 @@ int main(int argc, char *argv[])
 
 	init_try(n_try);
         write_report(); /* we print the initial heuristic solution.  */
-		
 	while ( !termination_condition() ) {
 		
 	    construct_solutions();
