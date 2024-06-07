@@ -22,7 +22,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #endif
-// #include "matrixScrambler.h"
+#include "matrixScrambler.h"
 
 typedef int_fast64_t reallng;
 typedef reallng*   ptr_reallng;
@@ -542,6 +542,12 @@ int main(int argc, char* argv[])
                 flow[i] = tmpptr;
             }
         }
+		
+		if (scramble)
+		{
+			scrambleMatrix(dist, n, 2);
+			scrambleMatrix(flow, n, 2);
+		}
 
         QAP_input* qinput = new QAP_input(n, dist, flow, maxtime, ntrials, nalgpar, algpars);
 
