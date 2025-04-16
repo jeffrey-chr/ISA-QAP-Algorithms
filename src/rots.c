@@ -95,6 +95,7 @@ int compute_delta_part(type_matrix a, type_matrix b,
      (b[p[i]][p[s]]-b[p[j]][p[s]]+b[p[j]][p[r]]-b[p[i]][p[r]]) );
   }
 
+//TODO make the timing work - needs to be both inside and outside this function?
 void tabu_search(int n,                  /* problem size */
                  type_matrix a,          /* flows matrix */
                  type_matrix b,          /* distance matrix */
@@ -102,7 +103,9 @@ void tabu_search(int n,                  /* problem size */
                  int *best_cost,         /* cost of best solution */
                  int tabu_duration,      /* parameter 1 (< n^2/2) */
                  int aspiration,         /* parameter 2 (> n^2/2)*/
-                 int nr_iterations)      /* number of iterations */ 
+                 int nr_iterations,
+				 clock_t start,
+				 double maxtime)      /* number of iterations */ 
            
  
  {type_vector p;                        /* current solution */
@@ -199,6 +202,8 @@ void tabu_search(int n,                  /* problem size */
         else
          {delta[i][j] = compute_delta(n, a, b, p, i, j);};
      };
+	 
+	 if(ceil((clock() - start)/static_cast<double>(CLOCKS_PER_SEC))>=maxtime) {break;}
       
    }; 
   /* free memory*/
@@ -260,10 +265,12 @@ int main()
   for(no_res = 1; no_res <= nr_resolutions; no_res++)
    {generate_random_solution(n, solution);
 
+	clock_t start = clock();
     tabu_search(n, a, b,                     /* problem data */
                solution, &cost,              /* tabu search results */
                8*n, n*n*5,                   /* parameters */
-               nr_iterations);               /* number of iterations */
+               nr_iterations,					/* number of iterations */
+			   start, 1e9);               
 
     printf("%d Solution found by tabu search:\n", cost);
     for (i = 0; i < n; i = i+1) printf("%d ", solution[i]); 
@@ -310,6 +317,12 @@ int main()
   scanf("%d",&nr_iterations);
   printf("Number of trials:\n");
   scanf("%d",&nr_resolutions);*/
+  
+  double maxtime = qinput->maxtime;
+  int ntrials = qinput->ntrials;
+  n = qinput->n;
+  nr_iterations = 2000*n;
+  nr_resolutions = 1;
 
   /****************** dynamic memory allocation ******************/
   solution = (int*)calloc(n, sizeof(int));
@@ -323,25 +336,43 @@ int main()
   /*for (i = 0; i < n; i++) for (j = 0; j < n; j = j+1)
     fscanf(data_file,"%d", &a[i][j]);
 
-
   for (i = 0; i < n; i = i+1) for (j = 0; j < n; j = j+1)
     fscanf(data_file,"%d", &b[i][j]);
     
   fclose(data_file);*/
+  for (i = 0; i < n; i++) for (j = 0; j < n; j = j+1)
+	  a[i][j] = qinput->dist[i][j];
+  for (i = 0; i < n; i++) for (j = 0; j < n; j = j+1)
+	  a[i][j] = qinput->flow[i][j];
   
-  for(no_res = 1; no_res <= nr_resolutions; no_res++)
-   {generate_random_solution(n, solution);
+  for (int t = 0; t < ntrials; t++) {
+	  bool timereached = false;
+	  clock_t start = clock();
+	  double current_best = -1;
+	  for(no_res = 1; no_res <= nr_resolutions; no_res++)
+	   {generate_random_solution(n, solution);
 
-    tabu_search(n, a, b,                     /* problem data */
-               solution, &cost,              /* tabu search results */
-               8*n, n*n*5,                   /* parameters */
-               nr_iterations);               /* number of iterations */
+		tabu_search(n, a, b,                     /* problem data */
+				   solution, &cost,              /* tabu search results */
+				   8*n, n*n*5,                   /* parameters */
+				   nr_iterations,				/* number of iterations */
+				   start, maxtime);   
+		
+		if (current_best < 0 || current_best > cost)
+		{
+			current_best = cost;
+		}
+		
 
-    /*printf("%d Solution found by tabu search:\n", cost);
-    for (i = 0; i < n; i = i+1) printf("%d ", solution[i]); 
-    printf("\n");
-    somme_sol += cost;*/
-   }
+		/*printf("%d Solution found by tabu search:\n", cost);
+		for (i = 0; i < n; i = i+1) printf("%d ", solution[i]); 
+		printf("\n");
+		somme_sol += cost;*/
+	   }
+	   
+	   qoutput[t]->value = current_best;
+       qoutput[t]->time_for_best = 1000;
+  }
    
    /*printf("Average cost: %f, average dev: %f\n", 
           somme_sol/nr_resolutions, 100*(somme_sol/nr_resolutions - opt)/opt);*/

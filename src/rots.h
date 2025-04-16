@@ -3,12 +3,6 @@
 
 #include "structs.h"
 
-
-
-
 int jtc_interface_rots(QAP_input* qinput, QAP_output** qoutput);
-
-
-
 
 #endif
