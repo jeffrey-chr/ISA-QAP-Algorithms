@@ -138,7 +138,6 @@ MMAS-bench: ./src/ACO/acoqap.c ./src/ACO/aco.c ./src/ACO/QAP.c ./src/ACO/QAP.h .
 	$(CXX) $(ACO_CFLAGS) -o ./bin/MMAS-bench ./obj/handler-ACO-bench.o ./obj/acoqap.o ./obj/aco.o ./obj/QAP-aco.o ./obj/utilities-aco.o ./obj/ants-aco.o ./obj/qap-ants-aco.o ./obj/InOut-aco.o ./obj/unix_timer-aco.o ./obj/ls-aco.o ./obj/parse-aco.o ./obj/adaptation-aco.o \
 	
 
-
 ACO-MAIN: ./src/ACO/acoqap.c ./src/ACO/aco.c ./src/ACO/QAP.c ./src/ACO/QAP.h ./src/ACO/utilities.c ./src/ACO/utilities.h ./src/ACO/ants.c ./src/ACO/qap-ants.c ./src/ACO/ants.h ./src/ACO/aco-parameters.def ./src/ACO/InOut.c ./src/ACO/InOut.h ./src/ACO/unix_timer.c ./src/ACO/timer.h ./src/ACO/qap-ls.c ./src/ACO/qap-ls.h ./src/ACO/parse.c ./src/ACO/parse.h ./src/ACO/adaptation.h 
 
 	$(CXX) $(ACO_CFLAGS) -c  -o ./obj/acoqap.o ./src/ACO/acoqap.c \
@@ -164,6 +163,12 @@ ACO-MAIN: ./src/ACO/acoqap.c ./src/ACO/aco.c ./src/ACO/QAP.c ./src/ACO/QAP.h ./s
 	$(CXX) $(ACO_CFLAGS) -c  -o ./obj/adaptation-aco.o ./src/ACO/adaptation.c \
 
 	$(CXX) $(ACO_CFLAGS) -o ./bin/ACO-main ./obj/acoqap.o ./obj/aco.o ./obj/QAP-aco.o ./obj/utilities-aco.o ./obj/ants-aco.o ./obj/qap-ants-aco.o ./obj/InOut-aco.o ./obj/unix_timer-aco.o ./obj/ls-aco.o ./obj/parse-aco.o ./obj/adaptation-aco.o \
+
+ROTS-MAIN: ./src/rots.c 
+
+	$(CXX) -c -o ./obj/rots.o ./src/rots.c 
+	
+	$(CXX) $(CXXFLAGS) -o ./bin/ROTS-main ./obj/rots.o
 
 handler: ./src/QAPhandler.cpp
 	$(CXX) $(CXXFLAGS) -c -D NONE -o ./obj/handler.o ./src/QAPhandler.cpp \
