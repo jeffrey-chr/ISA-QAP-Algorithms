@@ -170,6 +170,27 @@ ROTS-MAIN: ./src/rots.c
 	
 	$(CXX) $(CXXFLAGS) -o ./bin/ROTS-main ./obj/rots.o
 
+ROTS: ./src/rots.c 	
+	$(CXX) $(CXXFLAGS) -c -D ALGROTS -o ./obj/handler-ROTS.o ./src/QAPhandler.cpp \
+
+	$(CXX) $(CXXFLAGS) -c -o ./obj/ROTS.o ./src/rots.c  \
+		
+	$(CXX) $(CXXFLAGS) -o ./bin/ROTS ./obj/ROTS.o ./obj/handler-ROTS.o \
+
+ROTS-bench: ./src/rots.c 	
+	$(CXX) $(CXXFLAGS) -c -D ALGROTS -D BENCH -o ./obj/handler-ROTS.o ./src/QAPhandler.cpp \
+
+	$(CXX) $(CXXFLAGS) -c -o ./obj/ROTS.o ./src/rots.c  \
+		
+	$(CXX) $(CXXFLAGS) -o ./bin/ROTS ./obj/ROTS.o ./obj/handler-ROTS.o \
+
+ROTS-debug: ./src/rots.c 	
+	$(CXX) $(CXXFLAGS) -c -D ALGROTS -D DEBUG -o ./obj/handler-ROTS.o ./src/QAPhandler.cpp \
+
+	$(CXX) $(CXXFLAGS) -c -o ./obj/ROTS.o ./src/rots.c  \
+		
+	$(CXX) $(CXXFLAGS) -o ./bin/ROTS ./obj/ROTS.o ./obj/handler-ROTS.o \
+
 handler: ./src/QAPhandler.cpp
 	$(CXX) $(CXXFLAGS) -c -D NONE -o ./obj/handler.o ./src/QAPhandler.cpp \
 		

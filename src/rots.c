@@ -363,13 +363,17 @@ int main()
 			current_best = cost;
 		}
 		
-
-		/*printf("%d Solution found by tabu search:\n", cost);
+#ifdef DEBUG
+		printf("%d Solution found by tabu search:\n", cost);
 		for (i = 0; i < n; i = i+1) printf("%d ", solution[i]); 
 		printf("\n");
-		somme_sol += cost;*/
+#endif
+		/*somme_sol += cost;*/
 	   }
 	   
+#ifdef DEBUG
+		printf("Experiment %d: %d best solution found by tabu search:\n", cost);
+#endif
 	   qoutput[t]->value = current_best;
        qoutput[t]->time_for_best = 1000;
   }

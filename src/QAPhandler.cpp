@@ -43,6 +43,10 @@ typedef reallng*   ptr_reallng;
 #include "ACO/aco.h"
 #endif
 
+#ifdef ALGROTS
+#include "rots.h"
+#endif
+
 #include "structs.h"
 
 int main(int argc, char* argv[])
@@ -656,6 +660,13 @@ jtc_interface_bls(qinput, qoutput);
         std::cout << "BMA\n";
     }
         jtc_interface_bma(qinput, qoutput);
+#endif
+
+#ifdef ALGROTS
+    if (!indtrials || thisindtrial == 1) {
+        std::cout << "ROTS\n";
+    }
+        jtc_interface_rots(qinput, qoutput);
 #endif
 
 #ifdef ALGACO
