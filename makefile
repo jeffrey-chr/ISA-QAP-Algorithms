@@ -166,7 +166,7 @@ ACO-MAIN: ./src/ACO/acoqap.c ./src/ACO/aco.c ./src/ACO/QAP.c ./src/ACO/QAP.h ./s
 
 ROTS-MAIN: ./src/rots.c 
 
-	$(CXX) -c -o ./obj/rots.o ./src/rots.c 
+	$(CXX) -c -D ROTSMAIN -o ./obj/rots.o ./src/rots.c 
 	
 	$(CXX) $(CXXFLAGS) -o ./bin/ROTS-main ./obj/rots.o
 

@@ -23,7 +23,7 @@ E. Taillard, 14.03.2006
 #include <stdlib.h>
 #include<ctime>
 #include<time.h>
-#include<math.h>
+#include<math.h>z
 
 const int infinite = 999999999;
 const int FALSE = 0;
@@ -222,6 +222,7 @@ void generate_random_solution(int n, type_vector  p)
   for (i = 0; i < n-1; i++) transpose(&p[i], &p[unif(i, n-1)]);
  }
 
+#ifdef ROTSMAIN
 int main()
  {int n;                    /* problem size */
   type_matrix a, b;         /* flows and distances matrices*/
@@ -294,8 +295,8 @@ int main()
   getchar();
   return EXIT_SUCCESS;
  }
+ #endif
  
- #ifdef FALSE
  int jtc_interface_rots(QAP_input* qinput, QAP_output** qoutput) {
 	 int n;                    /* problem size */
   type_matrix a, b;         /* flows and distances matrices*/
@@ -394,4 +395,3 @@ int main()
   getchar();*/
   return EXIT_SUCCESS;
  }
-#endif
