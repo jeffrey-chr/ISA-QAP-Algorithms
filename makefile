@@ -39,28 +39,28 @@ bench: BLS-bench BMA-bench MMAS-bench
 debug: BLS-debug BMA-debug
 
 BLS: ./src/BLS_code.cpp	
-	$(CXX) $(CXXFLAGS) -c -D BLS -o ./obj/handler-BLS.o ./src/QAPhandler.cpp \
+	$(CXX) $(CXXFLAGS) -c -D ALGBLS -o ./obj/handler-BLS.o ./src/QAPhandler.cpp \
 
 	$(CXX) $(CXXFLAGS) -c -o ./obj/BLS.o ./src/BLS_code.cpp \
 		
 	$(CXX) $(CXXFLAGS) -o ./bin/BLS ./obj/BLS.o ./obj/handler-BLS.o \
 
 BMA: ./src/BMA.cpp	
-	$(CXX) $(CXXFLAGS) -c -D BMA -o ./obj/handler-BMA.o ./src/QAPhandler.cpp \
+	$(CXX) $(CXXFLAGS) -c -D ALGBMA -o ./obj/handler-BMA.o ./src/QAPhandler.cpp \
 
 	$(CXX) $(CXXFLAGS) -c -o ./obj/BMA.o ./src/BMA.cpp \
 		
 	$(CXX) $(CXXFLAGS) -o ./bin/BMA ./obj/BMA.o ./obj/handler-BMA.o \
 
 BLS-bench: ./src/BLS_code.cpp	
-	$(CXX) $(CXXFLAGS) -c -D BLS -D BENCH -o ./obj/handler-BLS-bench.o ./src/QAPhandler.cpp \
+	$(CXX) $(CXXFLAGS) -c -D ALGBLS -D BENCH -o ./obj/handler-BLS-bench.o ./src/QAPhandler.cpp \
 
 	$(CXX) $(CXXFLAGS) -c -o ./obj/BLS-bench.o ./src/BLS_code.cpp \
 		
 	$(CXX) $(CXXFLAGS) -o ./bin/BLS-bench ./obj/BLS-bench.o ./obj/handler-BLS-bench.o \
 
 BMA-bench: ./src/BMA.cpp	
-	$(CXX) $(CXXFLAGS) -c -D BMA -D BENCH -o ./obj/handler-BMA-bench.o ./src/QAPhandler.cpp \
+	$(CXX) $(CXXFLAGS) -c -D ALGBMA -D BENCH -o ./obj/handler-BMA-bench.o ./src/QAPhandler.cpp \
 
 	$(CXX) $(CXXFLAGS) -c -o ./obj/BMA-bench.o ./src/BMA.cpp \
 		
@@ -68,14 +68,14 @@ BMA-bench: ./src/BMA.cpp
 
 
 BLS-debug: ./src/BLS_code.cpp	
-	$(CXX) $(CXXFLAGS) -c -D BLS -D DEBUG -o ./obj/handler-BLS-debug.o ./src/QAPhandler.cpp \
+	$(CXX) $(CXXFLAGS) -c -D ALGBLS -D DEBUG -o ./obj/handler-BLS-debug.o ./src/QAPhandler.cpp \
 
 	$(CXX) $(CXXFLAGS) -c -D DEBUG -o ./obj/BLS-debug.o ./src/BLS_code.cpp \
 		
 	$(CXX) $(CXXFLAGS) -o ./bin/BLS-debug ./obj/BLS-debug.o ./obj/handler-BLS-debug.o \
 
 BMA-debug: ./src/BMA.cpp	
-	$(CXX) $(CXXFLAGS) -c -D BMA -D DEBUG -o ./obj/handler-BMA-debug.o ./src/QAPhandler.cpp \
+	$(CXX) $(CXXFLAGS) -c -D ALGBMA -D DEBUG -o ./obj/handler-BMA-debug.o ./src/QAPhandler.cpp \
 
 	$(CXX) $(CXXFLAGS) -c -D DEBUG -o ./obj/BMA-debug.o ./src/BMA.cpp \
 		
@@ -83,7 +83,7 @@ BMA-debug: ./src/BMA.cpp
     
 MMAS: ./src/ACO/acoqap.c ./src/ACO/aco.c ./src/ACO/QAP.c ./src/ACO/QAP.h ./src/ACO/utilities.c ./src/ACO/utilities.h ./src/ACO/ants.c ./src/ACO/qap-ants.c ./src/ACO/ants.h ./src/ACO/aco-parameters.def ./src/ACO/InOut.c ./src/ACO/InOut.h ./src/ACO/unix_timer.c ./src/ACO/timer.h ./src/ACO/qap-ls.c ./src/ACO/qap-ls.h ./src/ACO/parse.c ./src/ACO/parse.h ./src/ACO/adaptation.h 
 
-	$(CXX) $(CXXFLAGS) -c -D ACO -D MODULE -o ./obj/handler-ACO.o ./src/QAPhandler.cpp \
+	$(CXX) $(CXXFLAGS) -c -D ALGACO -D MODULE -o ./obj/handler-ACO.o ./src/QAPhandler.cpp \
 
 	$(CXX) $(ACO_CFLAGS) -c -D MODULE -o ./obj/acoqap.o ./src/ACO/acoqap.c \
 
@@ -111,7 +111,7 @@ MMAS: ./src/ACO/acoqap.c ./src/ACO/aco.c ./src/ACO/QAP.c ./src/ACO/QAP.h ./src/A
 	
 MMAS-bench: ./src/ACO/acoqap.c ./src/ACO/aco.c ./src/ACO/QAP.c ./src/ACO/QAP.h ./src/ACO/utilities.c ./src/ACO/utilities.h ./src/ACO/ants.c ./src/ACO/qap-ants.c ./src/ACO/ants.h ./src/ACO/aco-parameters.def ./src/ACO/InOut.c ./src/ACO/InOut.h ./src/ACO/unix_timer.c ./src/ACO/timer.h ./src/ACO/qap-ls.c ./src/ACO/qap-ls.h ./src/ACO/parse.c ./src/ACO/parse.h ./src/ACO/adaptation.h 
 
-	$(CXX) $(CXXFLAGS) -c -D ACO -D BENCH -D MODULE -o ./obj/handler-ACO-bench.o ./src/QAPhandler.cpp \
+	$(CXX) $(CXXFLAGS) -c -D ALGACO -D BENCH -D MODULE -o ./obj/handler-ACO-bench.o ./src/QAPhandler.cpp \
 
 	$(CXX) $(ACO_CFLAGS) -c -D MODULE -o ./obj/acoqap.o ./src/ACO/acoqap.c \
 

@@ -21,6 +21,9 @@ E. Taillard, 14.03.2006
 ****************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
+#include<ctime>
+#include<time.h>
+#include<math.h>
 
 const int infinite = 999999999;
 const int FALSE = 0;
