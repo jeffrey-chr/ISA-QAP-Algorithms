@@ -187,7 +187,7 @@ ROTS-bench: ./src/rots.c
 ROTS-debug: ./src/rots.c 	
 	$(CXX) $(CXXFLAGS) -c -D ALGROTS -D DEBUG -o ./obj/handler-ROTS-debug.o ./src/QAPhandler.cpp \
 
-	$(CXX) $(CXXFLAGS) -c -o ./obj/ROTS-debug.o ./src/rots.c  \
+	$(CXX) $(CXXFLAGS) -c -D DEBUG -o ./obj/ROTS-debug.o ./src/rots.c  \
 		
 	$(CXX) $(CXXFLAGS) -o ./bin/ROTS-debug ./obj/ROTS-debug.o ./obj/handler-ROTS-debug.o \
 

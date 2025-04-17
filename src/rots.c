@@ -325,11 +325,19 @@ int main()
   printf("Number of trials:\n");
   scanf("%d",&nr_resolutions);*/
   
+
+  
   double maxtime = qinput->maxtime;
   int ntrials = qinput->ntrials;
   n = qinput->n;
   nr_iterations = 2000*n;
   nr_resolutions = 1;
+  
+    #ifdef DEBUG
+		printf("Begin %d trials...:\n", qinput->ntrials);
+		for (i = 0; i < n; i = i+1) printf("%d ", solution[i]); 
+		printf("\n");
+	#endif
 
   /****************** dynamic memory allocation ******************/
   solution = (int*)calloc(n, sizeof(int));
