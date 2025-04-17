@@ -25,6 +25,9 @@ E. Taillard, 14.03.2006
 #include<time.h>
 #include<math.h>
 
+#include "structs.h"
+
+
 const int infinite = 999999999;
 const int FALSE = 0;
 const int TRUE = 1;
