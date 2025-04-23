@@ -381,6 +381,10 @@ int main()
 	  for(no_res = 1; no_res <= nr_resolutions; no_res++)
 	   {generate_random_solution(n, solution);
 
+#ifdef DEBUG
+      printf("Calling tabu search:\n", cost);
+#endif
+
 		tabu_search(n, a, b,                     /* problem data */
 				   solution, &cost,              /* tabu search results */
 				   8*n, n*n*5,                   /* parameters */
@@ -392,11 +396,11 @@ int main()
 			current_best = cost;
 		}
 		
-//#ifdef DEBUG
+#ifdef DEBUG
 		printf("%d Solution found by tabu search:\n", cost);
 		for (i = 0; i < n; i = i+1) printf("%d ", solution[i]); 
 		printf("\n");
-//#endif
+#endif
 
         if (ceil((clock() - start) / (static_cast<double>(CLOCKS_PER_SEC))) >= maxtime) { break; }
 
