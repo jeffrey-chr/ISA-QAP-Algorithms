@@ -349,8 +349,6 @@ int main()
   
     #ifdef DEBUG
 		printf("Begin %d trials...:\n", qinput->ntrials);
-		for (i = 0; i < n; i = i+1) printf("%d ", solution[i]); 
-		printf("\n");
 	#endif
 
   /****************** dynamic memory allocation ******************/
