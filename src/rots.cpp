@@ -68,7 +68,7 @@ int unif(int low, int high)
 
 void transpose(int *a, int *b) {int temp = *a; *a = *b; *b = temp;}
 
-int min(int a, int b) {if (a < b) return(a); else return(b);}
+//int min(int a, int b) {if (a < b) return(a); else return(b);}
 
 double cube(double x) {return x*x*x;}
 
@@ -195,7 +195,9 @@ void tabu_search(int n,                  /* problem size */
       if (current_cost < *best_cost)
        {*best_cost = current_cost;
         for (k = 0; k < n; k = k+1) best_sol[k] = p[k];
+#ifdef DEBUG
         printf("Solution of value: %d found at iter. %d\n", current_cost, current_iteration);
+#endif
        };
 
       /* update matrix of the move costs*/
@@ -209,7 +211,9 @@ void tabu_search(int n,                  /* problem size */
          {delta[i][j] = compute_delta(n, a, b, p, i, j);};
      };
 	 
-	 if(ceil((clock() - start)/static_cast<double>(CLOCKS_PER_SEC))>=maxtime) {break;}
+    double foo = 1;
+
+	 if ( ceil( (clock() - start) / (static_cast<double>(CLOCKS_PER_SEC)) )>=maxtime) {break;}
       
    }; 
   /* free memory*/
@@ -324,14 +328,24 @@ int main()
   scanf("%d",&nr_iterations);
   printf("Number of trials:\n");
   scanf("%d",&nr_resolutions);*/
-  
+  double itermult = 1;
+  switch (qinput->nalgparams) { // note where the break is.
+  case 1:
+      itermult = qinput->algparams[0];
+  case 0:
+      break;
+  default:
+      throw(-1);
+  }
+
 
   
   double maxtime = qinput->maxtime;
   int ntrials = qinput->ntrials;
   n = qinput->n;
-  nr_iterations = 2000*n;
-  nr_resolutions = 1;
+  nr_iterations = 2000*n*itermult;
+  nr_resolutions = 100000;
+  opt = -1;
   
     #ifdef DEBUG
 		printf("Begin %d trials...:\n", qinput->ntrials);
@@ -358,7 +372,7 @@ int main()
   for (i = 0; i < n; i++) for (j = 0; j < n; j = j+1)
 	  a[i][j] = qinput->dist[i][j];
   for (i = 0; i < n; i++) for (j = 0; j < n; j = j+1)
-	  a[i][j] = qinput->flow[i][j];
+	  b[i][j] = qinput->flow[i][j];
   
   for (int t = 0; t < ntrials; t++) {
 	  bool timereached = false;
@@ -378,11 +392,14 @@ int main()
 			current_best = cost;
 		}
 		
-#ifdef DEBUG
+//#ifdef DEBUG
 		printf("%d Solution found by tabu search:\n", cost);
 		for (i = 0; i < n; i = i+1) printf("%d ", solution[i]); 
 		printf("\n");
-#endif
+//#endif
+
+        if (ceil((clock() - start) / (static_cast<double>(CLOCKS_PER_SEC))) >= maxtime) { break; }
+
 		/*somme_sol += cost;*/
 	   }
 	   
