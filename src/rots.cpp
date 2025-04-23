@@ -27,6 +27,8 @@ E. Taillard, 14.03.2006
 
 #include "structs.h"
 
+typedef int_fast64_t reallng;
+
 
 const int infinite = 999999999;
 const int FALSE = 0;
@@ -106,7 +108,7 @@ void tabu_search(int n,                  /* problem size */
                  type_matrix a,          /* flows matrix */
                  type_matrix b,          /* distance matrix */
                  type_vector best_sol,   /* best solution found */
-                 int *best_cost,         /* cost of best solution */
+                 reallng *best_cost,         /* cost of best solution */
                  int tabu_duration,      /* parameter 1 (< n^2/2) */
                  int aspiration,         /* parameter 2 (> n^2/2)*/
                  int nr_iterations,
@@ -118,7 +120,7 @@ void tabu_search(int n,                  /* problem size */
   type_matrix delta;                    /* store move costs */
   type_matrix tabu_list;                /* tabu status */
   int current_iteration;                /* current iteration */
-  int current_cost;                     /* current sol. value */
+  reallng current_cost;                     /* current sol. value */
   int i, j, k, i_retained, j_retained;  /* indices */
   int min_delta;                        /* retained move cost */
   int autorized;                        /* move not tabu? */
@@ -166,7 +168,7 @@ void tabu_search(int n,                  /* problem size */
         aspired =
          (tabu_list[i][p[j]] < current_iteration-aspiration)||
          (tabu_list[j][p[i]] < current_iteration-aspiration)||
-         (current_cost + delta[i][j] < *best_cost);                
+         (current_cost + (reallng)delta[i][j] < *best_cost);
 
         if ((aspired && !already_aspired) || /* first move aspired*/
            (aspired && already_aspired &&    /* many move aspired*/
@@ -184,7 +186,7 @@ void tabu_search(int n,                  /* problem size */
      {/** transpose elements in pos. i_retained and j_retained **/
       transpose(&p[i_retained], &p[j_retained]);
       /* update solution value*/
-      current_cost = current_cost + delta[i_retained][j_retained];
+      current_cost = current_cost + (reallng)delta[i_retained][j_retained];
       /* forbid reverse move for a random number of iterations*/
       tabu_list[i_retained][p[j_retained]] = 
         current_iteration + (int)(cube(rando())*tabu_duration);
@@ -308,7 +310,7 @@ int main()
 	 int n;                    /* problem size */
   type_matrix a, b;         /* flows and distances matrices*/
   type_vector solution;     /* solution (permutation) */
-  int cost;                 /* solution cost */
+  reallng cost;                 /* solution cost */
   int nr_iterations,        /* number of tabu search iterations */
       nr_resolutions, no_res; /* number of trials */
 
@@ -375,7 +377,7 @@ int main()
   for (int t = 0; t < ntrials; t++) {
 	  bool timereached = false;
 	  clock_t start = clock();
-	  double current_best = -1;
+      reallng current_best = -1;
 	  for(no_res = 1; no_res <= nr_resolutions; no_res++)
 	   {generate_random_solution(n, solution);
 
