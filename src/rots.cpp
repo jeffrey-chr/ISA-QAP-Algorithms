@@ -328,6 +328,8 @@ int main()
   int i, j;
   char bidon[1000];
 
+	srand ( time(NULL) );
+
   seed1 = rand() % 90000 + 10000;
   seed2 = rand() % 90000 + 10000;
   seed3 = rand() % 90000 + 10000;
