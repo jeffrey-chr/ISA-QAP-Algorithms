@@ -37,14 +37,23 @@ const int TRUE = 1;
 typedef int*  type_vector;
 typedef int** type_matrix;
 
+int seed1;
+int seed2;
+int seed3;
+int seed4;
+int seed5;
+int seed6;
+
 int opt;
 double  somme_sol = 0.0;
 
 /*************** L'Ecuyer random number generator ***************/
 double rando()
  {
-  static int x10 = 12345, x11 = 67890, x12 = 13579, /* initial value*/
-             x20 = 24680, x21 = 98765, x22 = 43210; /* of seeds*/
+  static int x10 = seed1, x11 = seed2, x12 = seed3, /* initial value*/
+             x20 = seed4, x21 = seed5, x22 = seed6; /* of seeds*/
+  //static int x10 = 12345, x11 = 67890, x12 = 13579, /* initial value*/
+  //           x20 = 24680, x21 = 98765, x22 = 43210; /* of seeds*/
   const int m = 2147483647; const int m2 = 2145483479; 
   const int a12= 63308; const int q12=33921; const int r12=12979; 
   const int a13=-183326; const int q13=11714; const int r13=2883; 
@@ -318,6 +327,16 @@ int main()
   //char file_name[30];
   int i, j;
   char bidon[1000];
+
+  seed1 = rand() % 90000 + 10000;
+  seed2 = rand() % 90000 + 10000;
+  seed3 = rand() % 90000 + 10000;
+  seed4 = rand() % 90000 + 10000;
+  seed5 = rand() % 90000 + 10000;
+  seed6 = rand() % 90000 + 10000;
+  #ifdef DEBUG
+  printf("Random seeds: %d %d %d %d %d %d", seed1, seed2, seed3, seed4, seed5, seed6);
+  #endif
 
   /************** read file name and problem size ***************/
   /*printf("Data file name : \n");
